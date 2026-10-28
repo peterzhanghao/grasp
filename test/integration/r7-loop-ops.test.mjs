@@ -1,3 +1,4 @@
+import { SCHEMA_VERSION } from '../../src/domain/schema.js'
 /**
  * R7 · Host ops v3（掌控卡 / 干预 / 观察 / 版本 / 首页导航）与 agent 只读工具（T03 / Issue #8）
  *
@@ -516,4 +517,12 @@ test('R7 · agent 工具只读卡与今天，写 observation verdict 被明确�
   const note = await host.callTool('loop_atlas', { action: 'save_note', subject: { kind: 'node', id: nodeId }, text: 'agent 可以写笔记' })
   assert.equal(note.ok, true)
   assert.equal(note.note.authorSource, 'ai-draft', 'agent 笔记仍标记为 ai-draft')
+})
+
+test('R7 · GET /health 报告真实 schemaVersion（T01 遗留漂移修复）', async (t) => {
+  const { host } = await createHost(t, { label: 'health' })
+  const res = await host.get('/api/loop-atlas/health')
+  assert.equal(res.status, 200)
+  assert.equal(res.body.ok, true)
+  assert.equal(res.body.schemaVersion, SCHEMA_VERSION, '/health 的 schemaVersion 必须来自 domain 常量')
 })
