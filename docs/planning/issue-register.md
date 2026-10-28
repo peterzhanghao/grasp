@@ -5,18 +5,18 @@
 - 同步快照：2026-10-28 创建（创建后回读通过；后续变更随 PR 更新本表）
 - 状态口径：`status::*` 唯一；blocked-by 全部关闭后才能置 `ready`
 
-| 规划键 | GitHub # | 标题 | 状态（创建时） | 依赖 | 同步状态 | 最后回读 |
+| 规划键 | GitHub # | 标题 | 状态（回读） | 依赖 | 同步状态 | 最后回读 |
 | --- | --- | --- | --- | --- | --- | --- |
-| GRASP-00 | [#1](https://github.com/peterzhanghao/grasp/issues/1) | 总控 | tracking | — | in-sync | 2026-10-28 |
-| GRASP-P1 | [#2](https://github.com/peterzhanghao/grasp/issues/2) | [Tracking] P1 · 地基：schema v3 / 引擎 / host ops / 内容教练包 | tracking | — | in-sync | 2026-10-28 |
-| GRASP-P2 | [#3](https://github.com/peterzhanghao/grasp/issues/3) | [Tracking] P2 · 教练 UI：首页 / 掌控六问 / 掌控卡 / 观察修订 | tracking | — | in-sync | 2026-10-28 |
-| GRASP-P3 | [#4](https://github.com/peterzhanghao/grasp/issues/4) | [Tracking] P3 · 会话证据：只读摘要 / 候选预览 / 删除撤回 | tracking | — | in-sync | 2026-10-28 |
-| GRASP-P4 | [#5](https://github.com/peterzhanghao/grasp/issues/5) | [Tracking] P4 · 打磨验收：真实使用 / 实机视觉 / 发布回退 | tracking | — | in-sync | 2026-10-28 |
-| GRASP-T01 | [#6](https://github.com/peterzhanghao/grasp/issues/6) | [T01] 数据模型 v3 与 v2→v3 迁移（含备份/归档/回退） | ready | — | in-sync | 2026-10-28 |
-| GRASP-T02 | [#7](https://github.com/peterzhanghao/grasp/issues/7) | [T02] 缺口诊断与「今天这一步」纯函数引擎 | ready | — | in-sync | 2026-10-28 |
-| GRASP-T03 | [#8](https://github.com/peterzhanghao/grasp/issues/8) | [T03] Host ops v3：掌控卡/干预/观察/版本/应用产物 + 接口 | blocked | T01 | in-sync | 2026-10-28 |
-| GRASP-T04 | [#9](https://github.com/peterzhanghao/grasp/issues/9) | [T04] 内容教练包：缺口→原理卡映射与四类系统六问话术 | ready | — | in-sync | 2026-10-28 |
-| GRASP-T05 | [#10](https://github.com/peterzhanghao/grasp/issues/10) | [T05] 改名收尾：host 文案与仓库文档切到「掌控 / Grasp」 | ready | — | in-sync | 2026-10-28 |
+| GRASP-00 | [#1](https://github.com/peterzhanghao/grasp/issues/1) | 总控 | unknown | — | in-sync | 2026-10-28 |
+| GRASP-P1 | [#2](https://github.com/peterzhanghao/grasp/issues/2) | [Tracking] P1 · 地基：schema v3 / 引擎 / host ops / 内容教练包 | unknown | — | in-sync | 2026-10-28 |
+| GRASP-P2 | [#3](https://github.com/peterzhanghao/grasp/issues/3) | [Tracking] P2 · 教练 UI：首页 / 掌控六问 / 掌控卡 / 观察修订 | unknown | — | in-sync | 2026-10-28 |
+| GRASP-P3 | [#4](https://github.com/peterzhanghao/grasp/issues/4) | [Tracking] P3 · 会话证据：只读摘要 / 候选预览 / 删除撤回 | unknown | — | in-sync | 2026-10-28 |
+| GRASP-P4 | [#5](https://github.com/peterzhanghao/grasp/issues/5) | [Tracking] P4 · 打磨验收：真实使用 / 实机视觉 / 发布回退 | unknown | — | in-sync | 2026-10-28 |
+| GRASP-T01 | [#6](https://github.com/peterzhanghao/grasp/issues/6) | [T01] 数据模型 v3 与 v2→v3 迁移（含备份/归档/回退） | done | — | in-sync | 2026-10-28 |
+| GRASP-T02 | [#7](https://github.com/peterzhanghao/grasp/issues/7) | [T02] 缺口诊断与「今天这一步」纯函数引擎 | done | — | in-sync | 2026-10-28 |
+| GRASP-T03 | [#8](https://github.com/peterzhanghao/grasp/issues/8) | [T03] Host ops v3：掌控卡/干预/观察/版本/应用产物 + 接口 | done | T01 | in-sync | 2026-10-28 |
+| GRASP-T04 | [#9](https://github.com/peterzhanghao/grasp/issues/9) | [T04] 内容教练包：缺口→原理卡映射与四类系统六问话术 | done | — | in-sync | 2026-10-28 |
+| GRASP-T05 | [#10](https://github.com/peterzhanghao/grasp/issues/10) | [T05] 改名收尾：host 文案与仓库文档切到「掌控 / Grasp」 | in-progress | — | in-sync | 2026-10-28 |
 | GRASP-T06 | [#11](https://github.com/peterzhanghao/grasp/issues/11) | [T06] 新信息架构外壳：今天/向导/掌控卡/原理库/资料与权限 | blocked | T01, T02, T03 | in-sync | 2026-10-28 |
 | GRASP-T07 | [#12](https://github.com/peterzhanghao/grasp/issues/12) | [T07] 掌控六问向导：10 分钟建出第一张卡 | blocked | T06 | in-sync | 2026-10-28 |
 | GRASP-T08 | [#13](https://github.com/peterzhanghao/grasp/issues/13) | [T08] 掌控卡详情：小回路图 + 缺口 + 原理卡 + 今天这一步 | blocked | T06 | in-sync | 2026-10-28 |
