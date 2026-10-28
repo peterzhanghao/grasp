@@ -1,0 +1,6 @@
+{
+  "name": "loop-atlas-client-tests",
+  "private": true,
+  "type": "module",
+  "main": "index.mjs"
+}

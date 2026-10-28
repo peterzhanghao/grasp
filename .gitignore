@@ -1,0 +1,13 @@
+node_modules/
+.dsh-src/
+
+# 本地实机验收证据与截图（含个人会话/环境信息，不进入公开仓库）
+docs/evidence/
+tools/qa/evidence/
+
+# 本地窗口/截图自动化脚本（仅本机使用，含本地路径）
+tools/*.ps1
+
+*.log
+Thumbs.db
+.DS_Store

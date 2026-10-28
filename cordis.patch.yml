@@ -1,0 +1,5 @@
+- insert:
+    - id: loop-atlas
+      name: '@local/loop-atlas'
+      config:
+        dataDir: 'D:\plug-in\loop-atlas-data'

@@ -1,0 +1,5 @@
+{
+  "private": true,
+  "description": "QA 假宿主 harness 自测入口。使 `node --test test/harness` 在 Node >= 24 下可直接运行。",
+  "main": "harness.test.mjs"
+}

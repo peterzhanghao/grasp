@@ -1,0 +1,4358 @@
+{
+  "schemaVersion": 2,
+  "packId": "loop-cybernetics-core",
+  "version": "1.0.0",
+  "language": "zh-CN",
+  "status": "authored_for_this_plugin_sources_claimed_verified_where_linked",
+  "definitionOfCore": "能界定目标与边界、解释动态回路、评估感知与行动限制、设计并验证调节、适应变化、追问观察者与责任，再把这一整套认识迁移成可检验的编程智能体工作回路。",
+  "definitionOfFormal": "formal 只用于：写明了前提（模型类型、范围、成立条件）并且有推导依据的形式结果；历史影响、解释性联系、类比、工程迁移分别使用 historical / interpretation / analogy / application，不允许把历史解释或类比称为定理。",
+  "groups": [
+    {
+      "id": "g1",
+      "order": 1,
+      "title": "目标与系统边界",
+      "question": "要维持的量是什么，系统到哪里为止？",
+      "capability": "界定目标、边界与观察者的位置，说清谁在判定。",
+      "entryNodeId": "goal"
+    },
+    {
+      "id": "g2",
+      "order": 2,
+      "title": "回路与动态",
+      "question": "反馈怎样让系统自我纠正，又怎样放大偏离？",
+      "capability": "从历史问题辨认反馈、放大与调节能力。",
+      "entryNodeId": "feedback"
+    },
+    {
+      "id": "g3",
+      "order": 3,
+      "title": "时间与稳定",
+      "question": "同一条回路，为什么有时收敛、有时振荡？",
+      "capability": "用轨迹检验延迟、采样与稳定性。",
+      "entryNodeId": "delay"
+    },
+    {
+      "id": "g4",
+      "order": 4,
+      "title": "信号与认识",
+      "question": "我们测到的、推断的、传输的，差在哪里？",
+      "capability": "区分传输、测量与状态可辨认性。",
+      "entryNodeId": "measurement"
+    },
+    {
+      "id": "g5",
+      "order": 5,
+      "title": "能力与适应",
+      "question": "动作够不够用，什么时候该换规则？",
+      "capability": "识别行动限制及调节规则的改变。",
+      "entryNodeId": "actuator"
+    },
+    {
+      "id": "g6",
+      "order": 6,
+      "title": "设计与取舍",
+      "question": "用模型、预测与鲁棒性换取的是什么？",
+      "capability": "选择模型、控制器及跨条件验证。",
+      "entryNodeId": "model"
+    },
+    {
+      "id": "g7",
+      "order": 7,
+      "title": "组织与历史实践",
+      "question": "一个组织靠什么指标与结构维持自己？",
+      "capability": "辨认协调、代理目标与制度条件。",
+      "entryNodeId": "vsm"
+    },
+    {
+      "id": "g8",
+      "order": 8,
+      "title": "观察者、责任与智能体",
+      "question": "谁在观察、谁负责，智能体怎样形成可检验的工作回路？",
+      "capability": "将认识迁移为可验证的任务工作过程。",
+      "entryNodeId": "secondorder"
+    }
+  ],
+  "sources": [
+    {
+      "id": "s.maxwell1868",
+      "title": "On Governors",
+      "author": "J. C. Maxwell",
+      "year": 1868,
+      "kind": "paper",
+      "ref": "Proceedings of the Royal Society of London, No. 100, pp. 270–283",
+      "url": "https://doi.org/10.1098/rspl.1867.0055",
+      "doi": "10.1098/rspl.1867.0055",
+      "verified": "secondary",
+      "verifiedAt": "2026-10-28T00:40:00.000Z",
+      "verifiedBy": "web",
+      "note": "Crossref 官方记录（含摘要）已读；另读维基文库依原扫描校对的 1868 全文转录（en.wikisource.org/wiki/On_Governors），核对到「扰动应持续增长 / 应持续衰减 / 增幅振荡 / 衰减振荡」四类运动与根的条件。Royal Society 扫描 PDF 本机工具无法解析，未逐页核对原件。"
+    },
+    {
+      "id": "s.rwb1943",
+      "title": "Behavior, Purpose and Teleology",
+      "author": "A. Rosenblueth; N. Wiener; J. Bigelow",
+      "year": 1943,
+      "kind": "paper",
+      "ref": "Philosophy of Science 10(1):18–24",
+      "url": "https://doi.org/10.1086/286788",
+      "doi": "10.1086/286788",
+      "verified": "verified",
+      "verifiedAt": "2026-10-28T00:40:00.000Z",
+      "verifiedBy": "web",
+      "note": "archive.org 公开全文 OCR 已读（同一论文扫描）；Crossref 书目核对。读到「Teleological behavior thus becomes synonymous with behavior controlled by negative feedback」及反馈阻尼不足会变成正反馈的讨论。"
+    },
+    {
+      "id": "s.wiener1948",
+      "title": "Cybernetics: Or Control and Communication in the Animal and the Machine",
+      "author": "N. Wiener",
+      "year": 1948,
+      "kind": "book",
+      "ref": "John Wiley & Sons / MIT Press；第二版 1961",
+      "url": "https://archive.org/details/cyberneticsofcon0000unse",
+      "doi": null,
+      "verified": "secondary",
+      "verifiedAt": "2026-10-28T00:40:00.000Z",
+      "verifiedBy": "web",
+      "note": "archive.org 馆藏扫描元数据（1948, John Wiley）与开放书目记录核对；扫描全文受借阅限制未读正文，因此本包对《控制论》的主张按二手核验标 secondary。"
+    },
+    {
+      "id": "s.wiener1950",
+      "title": "The Human Use of Human Beings: Cybernetics and Society",
+      "author": "N. Wiener",
+      "year": 1950,
+      "kind": "book",
+      "ref": "Eyre & Spottiswoode（伦敦，1950）；Houghton Mifflin（美国）",
+      "url": "https://archive.org/details/the-human-use-of-human-beings",
+      "doi": null,
+      "verified": "verified",
+      "verifiedAt": "2026-10-28T00:40:00.000Z",
+      "verifiedBy": "web",
+      "note": "archive.org 公开扫描全文（1950 Eyre & Spottiswoode 版）已读；确认书中讨论自动化、通信与人所处的社会后果，而非只讨论工程稳定性。OCR 文本，未逐页引用。"
+    },
+    {
+      "id": "s.ashby1956",
+      "title": "An Introduction to Cybernetics",
+      "author": "W. Ross Ashby",
+      "year": 1956,
+      "kind": "book",
+      "ref": "Chapman & Hall / John Wiley",
+      "url": "https://archive.org/details/introductiontocy00ashb",
+      "doi": null,
+      "verified": "verified",
+      "verifiedAt": "2026-10-28T00:40:00.000Z",
+      "verifiedBy": "web",
+      "note": "archive.org 公开扫描全文已读；核对到 Part Two 第 11 章「Requisite Variety / The law」原文「only variety can destroy variety」，以及第 6 章「The Black Box」。未逐页引用。"
+    },
+    {
+      "id": "s.ashby1952",
+      "title": "Design for a Brain: The Origin of Adaptive Behavior",
+      "author": "W. Ross Ashby",
+      "year": 1952,
+      "kind": "book",
+      "ref": "Chapman & Hall；本包所读为 archive.org 1954 印次扫描",
+      "url": "https://archive.org/details/designforabrain",
+      "doi": null,
+      "verified": "verified",
+      "verifiedAt": "2026-10-28T00:40:00.000Z",
+      "verifiedBy": "web",
+      "note": "archive.org 公开扫描全文（1954 印次）已读；核对到 Homeostat、ultrastability、essential variables 等章节与论述。未逐页引用。"
+    },
+    {
+      "id": "s.shannon1948",
+      "title": "A Mathematical Theory of Communication",
+      "author": "C. E. Shannon",
+      "year": 1948,
+      "kind": "paper",
+      "ref": "Bell System Technical Journal 27(3):379–423；27(4):623–656",
+      "url": "https://doi.org/10.1002/j.1538-7305.1948.tb01338.x",
+      "doi": "10.1002/j.1538-7305.1948.tb01338.x",
+      "verified": "verified",
+      "verifiedAt": "2026-10-28T00:40:00.000Z",
+      "verifiedBy": "web",
+      "note": "archive.org BSTJ 27(3) 公开全文 OCR 已读；核对到「The fundamental problem of communication…」与「These semantic aspects of communication are irrelevant to the engineering problem」。Crossref 记录确认此 DOI 为本文第一部分（pp. 379–423）。"
+    },
+    {
+      "id": "s.nyquist1928",
+      "title": "Certain Topics in Telegraph Transmission Theory",
+      "author": "H. Nyquist",
+      "year": 1928,
+      "kind": "paper",
+      "ref": "Transactions of the American Institute of Electrical Engineers 47(2):617–644",
+      "url": "https://doi.org/10.1109/T-AIEE.1928.5055024",
+      "doi": "10.1109/T-AIEE.1928.5055024",
+      "verified": "secondary",
+      "verifiedAt": "2026-10-28T00:40:00.000Z",
+      "verifiedBy": "web",
+      "note": "Crossref 书目记录已核对；未找到可打开的公开全文，故采样定理的正式表述以 Shannon 1948 全文为准，此条只作历史优先权线索。"
+    },
+    {
+      "id": "s.nyquist1932",
+      "title": "Regeneration Theory",
+      "author": "H. Nyquist",
+      "year": 1932,
+      "kind": "paper",
+      "ref": "Bell System Technical Journal 11(1):126–147",
+      "url": "https://archive.org/details/bstj11-1-126",
+      "doi": "10.1002/j.1538-7305.1932.tb02344.x",
+      "verified": "verified",
+      "verifiedAt": "2026-10-28T00:40:00.000Z",
+      "verifiedBy": "web",
+      "note": "archive.org BSTJ 11(1) 公开全文 OCR 已读；核对到「This paper deals with the theory of stability of such systems」与 regeneration/feed-back 的稳定/不稳定讨论。未逐页引用。"
+    },
+    {
+      "id": "s.minorsky1922",
+      "title": "Directional Stability of Automatically Steered Bodies",
+      "author": "N. Minorsky",
+      "year": 1922,
+      "kind": "paper",
+      "ref": "Journal of the American Society of Naval Engineers 34(2):280–309",
+      "url": "https://archive.org/details/sim_naval-engineers-journal_1922-05_34_2",
+      "doi": "10.1111/j.1559-3584.1922.tb04958.x",
+      "verified": "verified",
+      "verifiedAt": "2026-10-28T00:40:00.000Z",
+      "verifiedBy": "web",
+      "note": "archive.org 公开扫描（1922-05, Vol. 34 Iss. 2）已读；文章标题「AUTOMATICALLY STEERED BODIES」与起始页 280 和 Crossref 记录（pp. 280–309）一致。OCR 质量有限，未逐句引用。"
+    },
+    {
+      "id": "s.conantashby1970",
+      "title": "Every Good Regulator of a System Must Be a Model of That System",
+      "author": "R. C. Conant; W. Ross Ashby",
+      "year": 1970,
+      "kind": "paper",
+      "ref": "International Journal of Systems Science 1(2):89–97",
+      "url": "https://doi.org/10.1080/00207727008920220",
+      "doi": "10.1080/00207727008920220",
+      "verified": "secondary",
+      "verifiedAt": "2026-10-28T00:40:00.000Z",
+      "verifiedBy": "web",
+      "note": "Crossref 记录（题名、作者、卷期页、参考文献）已核对；全文在 Taylor & Francis 付费墙内未打开，故该形式定理的表述按通行转述标 secondary，不引用页码或原文引文。"
+    },
+    {
+      "id": "s.heims1991",
+      "title": "The Cybernetics Group",
+      "author": "Steve J. Heims",
+      "year": 1991,
+      "kind": "book",
+      "ref": "MIT Press",
+      "url": "https://archive.org/details/cyberneticsgroup00heim",
+      "doi": null,
+      "verified": "secondary",
+      "verifiedAt": "2026-10-28T00:40:00.000Z",
+      "verifiedBy": "web",
+      "note": "archive.org 馆藏元数据（MIT Press, 1991）与 OpenLibrary 记录核对；扫描全文受借阅限制未读，故会议史与人物关系的表述标 secondary。"
+    },
+    {
+      "id": "s.pias2016",
+      "title": "Cybernetics: The Macy Conferences 1946–1953. The Complete Transactions",
+      "author": "Claus Pias (ed.)",
+      "year": 2016,
+      "kind": "book",
+      "ref": "英文版 University of Chicago Press / Diaphanes；德文原版 2003–2004（Band 1–2）",
+      "url": "https://openlibrary.org/books/OL28586892M",
+      "doi": null,
+      "verified": "secondary",
+      "verifiedAt": "2026-10-28T00:40:00.000Z",
+      "verifiedBy": "web",
+      "note": "OpenLibrary 版本记录（2016, University of Chicago Press）已核对；未读会议记录原文。会议跨度 1946–1953 与各卷出版年分开处理，不把会议年份当出版年。"
+    },
+    {
+      "id": "s.beer1972",
+      "title": "Brain of the Firm",
+      "author": "Stafford Beer",
+      "year": 1972,
+      "kind": "book",
+      "ref": "Allen Lane the Penguin Press（1972）；John Wiley 后续版本",
+      "url": "https://openlibrary.org/books/OL5709990M",
+      "doi": null,
+      "verified": "secondary",
+      "verifiedAt": "2026-10-28T00:40:00.000Z",
+      "verifiedBy": "web",
+      "note": "OpenLibrary 1972 版记录已核对；全书未读，VSM 五功能与组织诊断的表述按通行二手描述标 secondary，不引用页码。"
+    },
+    {
+      "id": "s.medina2011",
+      "title": "Cybernetic Revolutionaries: Technology and Politics in Allende's Chile",
+      "author": "Eden Medina",
+      "year": 2011,
+      "kind": "book",
+      "ref": "MIT Press, ISBN 978-0-262-01649-0",
+      "url": "https://archive.org/details/cybernetic-revolutionaries",
+      "doi": null,
+      "verified": "verified",
+      "verifiedAt": "2026-10-28T00:40:00.000Z",
+      "verifiedBy": "web",
+      "note": "archive.org 公开扫描全文已读；核对到 Project Cybersyn、telex 网络、1971–1973 与 1973 年政变相关叙述；版本记录与 OpenLibrary（2011, MIT Press）一致。未逐页引用。"
+    },
+    {
+      "id": "s.goodhart1975",
+      "title": "Problems of Monetary Management: The U.K. Experience",
+      "author": "Charles A. E. Goodhart",
+      "year": 1975,
+      "kind": "paper",
+      "ref": "Papers in Monetary Economics, vol. 1, Reserve Bank of Australia, 1975",
+      "url": "https://www.after-certainty.com/explore/sources/goodhart-charles-a-e-problems-of-monetary-management-the-u-k",
+      "doi": null,
+      "verified": "secondary",
+      "verifiedAt": "2026-10-28T00:40:00.000Z",
+      "verifiedBy": "web",
+      "note": "二手书目页（含完整会议论文集出处）已读；原文未读。「古德哈特定律」是后人对该文论证的概括，不是原文中的一条形式定理，本包按此区分。"
+    },
+    {
+      "id": "s.foerster1974",
+      "title": "Cybernetics of Cybernetics: Or the Control of Control and the Communication of Communication",
+      "author": "Heinz von Foerster (ed.)",
+      "year": 1974,
+      "kind": "book",
+      "ref": "Biological Computer Laboratory, University of Illinois（BCL Report 73.38）",
+      "url": "https://openlibrary.org/works/OL18508902W",
+      "doi": null,
+      "verified": "unverified",
+      "verifiedBy": null,
+      "verifiedAt": null,
+      "note": "未打开 1974 年 BCL Report 原件；仅检索到 OpenLibrary 1995 年重印记录。检索路径：BCL Report 73.38 馆藏号 / University of Illinois BCL 档案 / Cybernetics of Cybernetics 重印版。二阶控制论的人物与年份按常见二手记述，未核到原件。"
+    },
+    {
+      "id": "s.kalman1960",
+      "title": "On the General Theory of Control Systems",
+      "author": "R. E. Kalman",
+      "year": 1960,
+      "kind": "paper",
+      "ref": "IFAC Proceedings Volumes 1(1):491–502（First IFAC Congress, Moscow, 1960）",
+      "url": "https://doi.org/10.1016/S1474-6670(17)70094-8",
+      "doi": "10.1016/S1474-6670(17)70094-8",
+      "verified": "secondary",
+      "verifiedAt": "2026-10-28T00:40:00.000Z",
+      "verifiedBy": "web",
+      "note": "Crossref 记录（题名、作者、卷期页）已核对；全文未读。可控性/可观测性的秩条件按标准教材通行表述标 secondary，不引用页码。"
+    },
+    {
+      "id": "s.tsien1954",
+      "title": "Engineering Cybernetics",
+      "author": "Tsien Hsue-shen（钱学森）",
+      "year": 1954,
+      "kind": "book",
+      "ref": "McGraw-Hill",
+      "url": "https://openlibrary.org/books/OL20203656M",
+      "doi": null,
+      "verified": "secondary",
+      "verifiedAt": "2026-10-28T00:40:00.000Z",
+      "verifiedBy": "web",
+      "note": "OpenLibrary 1954 McGraw-Hill 版记录已核对；全书未读，工程控制论相关表述按通行二手描述标 secondary。"
+    },
+    {
+      "id": "s.astrom2008",
+      "title": "Feedback Systems: An Introduction for Scientists and Engineers",
+      "author": "K. J. Åström; R. M. Murray",
+      "year": 2008,
+      "kind": "book",
+      "ref": "Princeton University Press；作者开放网页/PDF 版本（fbsbook.org）",
+      "url": "https://fbsbook.org/",
+      "doi": null,
+      "verified": "secondary",
+      "verifiedAt": "2026-10-28T00:40:00.000Z",
+      "verifiedBy": "web",
+      "note": "开放教材站点与版本记录已核对；本机工具无法解析其 PDF 正文，故 Nyquist 判据、可控/可观测性、PID、鲁棒性等正式陈述按公开教材通行表述标 secondary，不引用页码。"
+    },
+    {
+      "id": "s.author-practice",
+      "title": "编程智能体工作过程：迁移说明（作者判断）",
+      "author": "本插件作者（非史料）",
+      "year": 2026,
+      "kind": "author-judgment",
+      "ref": null,
+      "url": null,
+      "doi": null,
+      "verified": "unverified",
+      "verifiedBy": null,
+      "verifiedAt": null,
+      "note": "作者判断，不是史料或形式结果：用于「智能体工作可画成回路」「验收即测量」等工程迁移主张。此类主张明确标为 interpretation，不冒充文献证据；检索路径为空，因为它的证据只能来自真实任务记录（本插件的 investigations / experiments / notes）。"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "boundary",
+      "groupId": "g1",
+      "kind": "concept",
+      "title": "系统边界",
+      "aliases": [
+        "系统边界",
+        "system boundary",
+        "系统内外"
+      ],
+      "era": "—",
+      "eraStart": null,
+      "eraEnd": null,
+      "eraPrecision": "unknown",
+      "def": "边界不是画在纸上的一条线，而是「哪些因素会改变你要维持的量」的一份判断。",
+      "can": "为一个编程需求画出系统内外，指出被排除的因素会怎样改变验收。",
+      "mech": "边界决定回路闭合在哪里：把 CI 画进去，测试通过才算反馈；画在外面，测试只是别人给你的报告。",
+      "limits": "扩大边界会增加解释负担，并不会自动更正确。边界必须由「会改变目标状态」来划，而不是由「看起来相关」来划。",
+      "counter": "把「用户会不会误用」画进边界后，原本一条断言就够的验收变成了可用性研究——成本失控。边界过大的反例。",
+      "check": "给一个「导出 CSV」的需求：列出至少 5 个候选因素，逐个判断是否影响「导出的内容正确」这个目标，并说明判断依据。",
+      "hist": "控制论把「系统」当作观察者选定的一组变量（Ashby 1956 从变量与状态出发定义机器），而不是世界的天然分区。",
+      "migrate": "在给编程智能体写任务前，先写「非目标」一栏：明确哪些因素不进入验收。",
+      "migrateType": "analogy",
+      "practiceStages": [
+        "goal",
+        "acceptance"
+      ],
+      "claimIds": [
+        "c.boundary.1",
+        "c.boundary.2"
+      ],
+      "sourceIds": [
+        "s.ashby1956",
+        "s.author-practice"
+      ],
+      "compat": {
+        "legacyIds": []
+      }
+    },
+    {
+      "id": "goal",
+      "groupId": "g1",
+      "kind": "concept",
+      "title": "目标与被维持的量",
+      "aliases": [
+        "目标",
+        "参考值",
+        "setpoint",
+        "reference"
+      ],
+      "era": "—",
+      "eraStart": null,
+      "eraEnd": null,
+      "eraPrecision": "unknown",
+      "def": "控制不是「让它动」，而是「让某个量保持在某个范围内」。说不出被维持的量，就没有控制系统。",
+      "can": "把一句模糊的「做得更好」改写成可观测的、有范围的目标量。",
+      "mech": "目标量一旦确定，测量方式、行动边界、失败判据都随之确定。目标量含糊时，后面的每一步都在猜。",
+      "limits": "目标量可以不是数字（如「不丢用户数据」），但必须是可判定的；目标由谁设定、谁承担代价，不由控制方程回答。",
+      "counter": "「提升用户体验」无法判定，于是任何改动都可以声称达标——这不是控制，是修辞。",
+      "check": "把「让列表页更快」改写成三个不同粒度的可判定目标，并指出哪一个会改变实现方案。",
+      "hist": "调节器的历史起点就是「维持」（瓦特调速器维持转速），而不是「优化」；维纳在《人有人的用处》里把「目标由谁选定」的社会面也带进讨论。",
+      "migrate": "任务契约的第一栏必须是「期望行为」，第二栏是「非目标」，并写清「谁有权改目标」。",
+      "migrateType": "application",
+      "practiceStages": [
+        "goal",
+        "acceptance"
+      ],
+      "claimIds": [
+        "c.goal.1",
+        "c.goal.2"
+      ],
+      "sourceIds": [
+        "s.ashby1956",
+        "s.wiener1950"
+      ],
+      "compat": {
+        "legacyIds": []
+      }
+    },
+    {
+      "id": "observer",
+      "groupId": "g1",
+      "kind": "concept",
+      "title": "观察者位置",
+      "aliases": [
+        "观察者",
+        "observer",
+        "二阶观察"
+      ],
+      "era": "1974",
+      "eraStart": 1974,
+      "eraEnd": 1974,
+      "eraPrecision": "year",
+      "def": "谁在描述这个系统，他自己在系统的哪里，决定了他能看见什么。",
+      "can": "指出一次验收里，谁在观察、谁被观察、观察者的利益如何影响「什么算通过」。",
+      "mech": "观察者的选择进入系统描述；同一个系统，开发者的「通过」与用户的「可用」是两个不同的观测面。",
+      "limits": "这不是说「一切观点等价」，而是说：任何测量都带着测量位置，必须写明。",
+      "counter": "声称「我们的测试是完全客观的」——忽略了测试由谁写、覆盖了谁的使用方式。",
+      "check": "为一个「登录失败提示」找三个观察者（开发者、攻击者、视力障碍用户），分别写出他们眼里的「正确」。",
+      "hist": "冯·福斯特等人推动的二阶控制论把观察者引入系统描述（1974 年会议文集是常见锚点）；此前控制论描述的多是「被观察的系统」。",
+      "migrate": "在任务契约里写明「谁来验收」，因为验收者的位置决定了他会漏掉什么。",
+      "migrateType": "analogy",
+      "practiceStages": [
+        "observation",
+        "acceptance"
+      ],
+      "claimIds": [
+        "c.observer.1",
+        "c.observer.2"
+      ],
+      "sourceIds": [
+        "s.foerster1974",
+        "s.heims1991"
+      ],
+      "compat": {
+        "legacyIds": []
+      }
+    },
+    {
+      "id": "wiener",
+      "groupId": "g1",
+      "kind": "concept",
+      "title": "维纳：控制、通信与责任",
+      "aliases": [
+        "维纳",
+        "Norbert Wiener",
+        "wiener",
+        "Cybernetics 1948",
+        "控制与通信"
+      ],
+      "era": "1948–1950",
+      "eraStart": 1948,
+      "eraEnd": 1950,
+      "eraPrecision": "range",
+      "def": "维纳把控制与通信放进同一个理论框架：机器、动物与社会都用消息与反馈来维持或改变状态。",
+      "can": "解释控制与通信为何被并置，并区分「执行正确」「目标合理」「责任归属」三件事。",
+      "mech": "他把目的性行为刻画为负反馈：系统用误差驱动行动，用结果修正下一次行动。",
+      "limits": "《控制论》（1948）是理论著作，《人有人的用处》（1950）是社会论述；两者不能互相替代，也不能把维纳当成整个领域的唯一源头。",
+      "counter": "「维纳发明了控制论」——把跨学科网络中的一位关键作者当成唯一源头，会掩盖梅西会议与工程传统。",
+      "check": "分别说明：一个执行完全正确的自动系统，为什么仍可能有目标不合理与责任不清的问题。",
+      "hist": "1943 年与罗森布鲁斯、比格罗合写《行为、目的与目的论》；1948 年出版《控制论》；1950 年出版《人有人的用处》。",
+      "migrate": "给智能体写任务时，把「执行正确」「目标由谁定」「谁承担后果」分开写，不要用一句「确保正确」合并。",
+      "migrateType": "application",
+      "practiceStages": [
+        "goal",
+        "observation"
+      ],
+      "claimIds": [
+        "c.wiener.1",
+        "c.wiener.2",
+        "c.wiener.3"
+      ],
+      "sourceIds": [
+        "s.rwb1943",
+        "s.wiener1948",
+        "s.wiener1950"
+      ],
+      "compat": {
+        "legacyIds": []
+      }
+    },
+    {
+      "id": "state",
+      "groupId": "g1",
+      "kind": "concept",
+      "title": "状态、输入与输出",
+      "aliases": [
+        "状态",
+        "state",
+        "状态空间",
+        "state space"
+      ],
+      "era": "—",
+      "eraStart": null,
+      "eraEnd": null,
+      "eraPrecision": "unknown",
+      "def": "状态是决定系统接下来会怎样变化的那组变量；输出是你在某个时刻能读到的那部分。",
+      "can": "用状态、输入、输出描述同一个系统，指出相同输出下不同后续行为的例子。",
+      "mech": "同一输出可以由不同内部状态产生；要区分它们，必须让输入变化并观察后续输出。",
+      "limits": "状态空间是建模选择：把哪些量算作状态，取决于你关心哪些后续行为。",
+      "counter": "「两次测试结果相同」被当成「两种实现等价」——这是从输出相同跳到状态相同。",
+      "check": "给两个测试结果相同但内部状态不同的实现，设计一个能区分它们的观测。",
+      "hist": "状态空间方法在 20 世纪中叶被系统化；卡尔曼 1960 年的工作把可控性/可观测性建立在状态描述上。",
+      "migrate": "给智能体写验收时，写出「哪些内部状态必须被观测到」，而不只是「哪些输出要对」。",
+      "migrateType": "analogy",
+      "practiceStages": [
+        "measurement",
+        "observation"
+      ],
+      "claimIds": [
+        "c.state.1",
+        "c.state.2"
+      ],
+      "sourceIds": [
+        "s.kalman1960",
+        "s.astrom2008"
+      ],
+      "compat": {
+        "legacyIds": []
+      }
+    },
+    {
+      "id": "feedback",
+      "groupId": "g2",
+      "kind": "concept",
+      "title": "负反馈",
+      "aliases": [
+        "负反馈",
+        "negative feedback",
+        "negative",
+        "反馈回路"
+      ],
+      "era": "1868",
+      "eraStart": 1868,
+      "eraEnd": 1868,
+      "eraPrecision": "year",
+      "def": "把输出的测量送回输入端，与目标比较，用差值去修正。",
+      "can": "画出一个回路：目标、测量、比较、行动，并指出差值在哪里计算。",
+      "mech": "负反馈把「一次做对」变成「持续纠正」，因此允许执行端不精确。",
+      "limits": "反馈只能纠正它测到的量；测错了，回路会稳定地走向错误。负反馈本身也不保证稳定。",
+      "counter": "恒温器稳定地维持 22℃，而窗户是开的——回路完全正常，房间依然冷。",
+      "check": "给一个「分页」功能：画出验收回路，指出哪一环只检查了「第一页」；再用实验 green 验证「全绿却错」。",
+      "hist": "麦克斯韦 1868 年用微分方程分析调速器的稳定性；1943 年罗森布鲁斯、维纳与比格罗把目的性行为解释为负反馈控制。",
+      "migrate": "测试就是回路的测量环节；测试全绿只说明测到的那部分稳定。",
+      "migrateType": "application",
+      "practiceStages": [
+        "measurement",
+        "action",
+        "observation"
+      ],
+      "claimIds": [
+        "c.feedback.1",
+        "c.feedback.2",
+        "c.feedback.3"
+      ],
+      "sourceIds": [
+        "s.maxwell1868",
+        "s.rwb1943",
+        "s.nyquist1932",
+        "s.ashby1956"
+      ],
+      "compat": {
+        "legacyIds": []
+      }
+    },
+    {
+      "id": "positive",
+      "groupId": "g2",
+      "kind": "concept",
+      "title": "正反馈与放大",
+      "aliases": [
+        "正反馈",
+        "positive feedback",
+        "放大环",
+        "self-reinforcing"
+      ],
+      "era": "—",
+      "eraStart": null,
+      "eraEnd": null,
+      "eraPrecision": "unknown",
+      "def": "把输出加回输入，使偏离自我增强。它不维稳，它加速。",
+      "can": "分辨一个回路是在压偏差还是在放大偏差，并指出放大是特性还是事故。",
+      "mech": "正反馈的终点通常是撞上边界（饱和、崩溃、爆炸），不是平衡。",
+      "limits": "正反馈并非总是坏的：锁存、启动、相变都依赖它。判据是「你希望它停在哪里」。",
+      "counter": "推荐系统优化点击率→标题更耸动→点击更多→继续加码。每一环都「有效」，整体在放大。",
+      "check": "找出一个「越用越糟」的产品机制，写出它的正反馈环，并标出饱和点。",
+      "hist": "反馈的符号不是固定的：罗森布鲁斯、维纳与比格罗指出阻尼不足的反馈会在某些频率上变成正反馈；梅西会议把「循环因果」作为核心议题之一。",
+      "migrate": "当智能体的「改进」让指标变好而任务变糟时，先找有没有正反馈环。",
+      "migrateType": "analogy",
+      "practiceStages": [
+        "action",
+        "observation"
+      ],
+      "claimIds": [
+        "c.positive.1",
+        "c.positive.2"
+      ],
+      "sourceIds": [
+        "s.rwb1943",
+        "s.heims1991",
+        "s.author-practice"
+      ],
+      "compat": {
+        "legacyIds": []
+      }
+    },
+    {
+      "id": "variety",
+      "groupId": "g2",
+      "kind": "concept",
+      "title": "必要多样性",
+      "aliases": [
+        "必要多样性",
+        "requisite variety",
+        "law of requisite variety",
+        "多样性"
+      ],
+      "era": "1956",
+      "eraStart": 1956,
+      "eraEnd": 1956,
+      "eraPrecision": "year",
+      "def": "控制器的可变反应数量，必须不少于被控对象可能出现的状态数量。只有多样性能够消灭多样性。",
+      "can": "判断一次控制为什么「怎么努力都管不住」，并把结论指向结构而不是努力程度。",
+      "mech": "若控制器比对象简单，必然存在它无法区分的状态；这些状态会被同一个动作错误地处理。",
+      "limits": "这不是「越复杂越好」；增加多样性有成本，通常的做法是让系统的一部分自己处理自己的多样性（分散、委派、改变结构）。",
+      "counter": "用一张固定的规则表处理所有代码评审情形，遇到规则外的情况会被强行归类。",
+      "check": "列出一个验收脚本能区分的输入类别数，与真实输入的类别数比较，指出差额。",
+      "hist": "艾什比在《控制论导论》（1956）第 11 章「Requisite Variety」中给出该定律：only variety can destroy variety。",
+      "migrate": "任务契约里的「允许行动范围」就是给智能体的多样性预算：太窄做不了，太宽失控。",
+      "migrateType": "application",
+      "practiceStages": [
+        "goal",
+        "action"
+      ],
+      "claimIds": [
+        "c.variety.1",
+        "c.variety.2"
+      ],
+      "sourceIds": [
+        "s.ashby1956"
+      ],
+      "compat": {
+        "legacyIds": []
+      }
+    },
+    {
+      "id": "macy",
+      "groupId": "g2",
+      "kind": "event",
+      "title": "梅西会议 1946–1953",
+      "aliases": [
+        "梅西会议",
+        "Macy Conferences",
+        "Macy 会议",
+        "1946-1953"
+      ],
+      "era": "1946–1953",
+      "eraStart": 1946,
+      "eraEnd": 1953,
+      "eraPrecision": "range",
+      "def": "梅西会议（1946–1953）是控制论形成期的跨学科系列会议：工程师、数学家、神经科学家、人类学家在同一张桌子上争论反馈、目的与信息。",
+      "can": "比较不同学科对「反馈」「信息」「目的」的用法，指出翻译中丢失的假设。",
+      "mech": "跨学科翻译靠类比发生；同一个词在不同学科里携带不同前提，会议记录保留了这些歧义。",
+      "limits": "会议跨度是 1946–1953，不等于各卷出版年；参与者观点并不统一，不能把会议当成一套统一学说。",
+      "counter": "引用「梅西会议认为……」——把一场持续七年的争论压缩为一个立场。",
+      "check": "给工程与社会组织各一个「反馈」主张，写出它们共享与不共享的假设。",
+      "hist": "系列会议由 Macy Foundation 资助；Heims 的《控制论小组》（1991）与 Pias 编订的会议文献汇编是主要二手与一手汇编材料。本包只核对了书目与二手研究，未逐条读会议记录。",
+      "migrate": "在跨团队协作里，先给「反馈」「验收」写出双方各自的定义，再讨论接口。",
+      "migrateType": "analogy",
+      "practiceStages": [
+        "observation",
+        "acceptance"
+      ],
+      "claimIds": [
+        "c.macy.1",
+        "c.macy.2"
+      ],
+      "sourceIds": [
+        "s.heims1991",
+        "s.pias2016"
+      ],
+      "compat": {
+        "legacyIds": []
+      }
+    },
+    {
+      "id": "delay",
+      "groupId": "g3",
+      "kind": "concept",
+      "title": "延迟",
+      "aliases": [
+        "延迟",
+        "delay",
+        "latency",
+        "dead time"
+      ],
+      "era": "—",
+      "eraStart": null,
+      "eraEnd": null,
+      "eraPrecision": "unknown",
+      "def": "从测量到行动生效之间的时间。你永远在修正一个已经过去的状态。",
+      "can": "预测一个带延迟的回路会不会振荡，并说出降低增益的理由。",
+      "mech": "延迟把「纠正」变成「过冲」：等效果出现时，偏差已经变了方向。延迟越大，可用的增益越小。",
+      "limits": "延迟不可消除时，出路不是更快，而是更慢、更稳，或把判决交给能等的一方。",
+      "counter": "二战高射炮预测器：炮弹飞行时间就是延迟，人算得再准也要打提前量。",
+      "check": "用实验 delay：把延迟调到 0.2/0.6/1.2，先预测轨迹，再运行，比较过冲幅度与判定。",
+      "hist": "1940 年代维纳与比格罗研究防空预测器，延迟与人机回路的问题直接催生了控制论（会议史见 Heims 1991）。节点本身没有单一确定年份，eraPrecision 记为 unknown。",
+      "migrate": "智能体的「改完再看结果」之间的时间就是延迟；延迟大时，一次改太多必然过冲。",
+      "migrateType": "application",
+      "practiceStages": [
+        "action",
+        "observation",
+        "revision"
+      ],
+      "claimIds": [
+        "c.delay.1",
+        "c.delay.2"
+      ],
+      "sourceIds": [
+        "s.heims1991",
+        "s.astrom2008"
+      ],
+      "compat": {
+        "legacyIds": []
+      }
+    },
+    {
+      "id": "stability",
+      "groupId": "g3",
+      "kind": "concept",
+      "title": "稳定性与振荡",
+      "aliases": [
+        "稳定性",
+        "stability",
+        "收敛",
+        "振荡",
+        "oscillation"
+      ],
+      "era": "1868",
+      "eraStart": 1868,
+      "eraEnd": 1868,
+      "eraPrecision": "year",
+      "def": "系统受扰动后能否回到目标附近，而不是越摆越大。",
+      "can": "从一条轨迹判断系统是收敛、临界还是发散，并找到让它收敛的参数区间。",
+      "mech": "稳定性由增益、延迟、惯性的组合决定；单独说某个参数「太大」没有意义。",
+      "limits": "稳定不等于正确：一个稳定地指向错误目标的回路，比振荡更难发现。",
+      "counter": "恒温器稳定在错误刻度上——很稳，但很错。",
+      "check": "在实验 delay 里找到「刚好开始振荡」的增益值，记录到两位小数，并写下判据。",
+      "hist": "麦克斯韦《论调速器》（1868）用方程根的条件分析调速器稳定性；奈奎斯特 1932 年给出反馈放大器稳定性的频域判据。",
+      "migrate": "智能体反复改同一处代码却越改越乱，是回路的稳定性问题，不是努力问题。",
+      "migrateType": "analogy",
+      "practiceStages": [
+        "observation",
+        "acceptance"
+      ],
+      "claimIds": [
+        "c.stability.1",
+        "c.stability.2",
+        "c.stability.3"
+      ],
+      "sourceIds": [
+        "s.maxwell1868",
+        "s.nyquist1932",
+        "s.astrom2008"
+      ],
+      "compat": {
+        "legacyIds": []
+      }
+    },
+    {
+      "id": "sampling",
+      "groupId": "g3",
+      "kind": "concept",
+      "title": "采样与分辨率",
+      "aliases": [
+        "采样",
+        "sampling",
+        "采样定理",
+        "混叠",
+        "aliasing"
+      ],
+      "era": "1928",
+      "eraStart": 1928,
+      "eraEnd": 1928,
+      "eraPrecision": "year",
+      "def": "你多久看一次、看多细，决定了你能看见多快的现象。",
+      "can": "指出一次观测的时间粒度会漏掉哪一类事件。",
+      "mech": "采样太稀，快速事件在两次观测之间发生又被抹平；采样太密，噪声被当成信号。",
+      "limits": "提高采样率不能恢复已经丢失的信息，只能减少未来的丢失。",
+      "counter": "每天跑一次回归测试，一个只在并发下出现、几十毫秒内恢复的竞态永远看不见。",
+      "check": "为一个「偶发失败」的问题，写出三种不同的观测粒度，并说明各自会漏掉什么。",
+      "hist": "奈奎斯特 1928 年讨论电报传输的采样率问题；香农 1948 年给出采样定理的正式表述（带限信号、均匀采样等前提）。",
+      "migrate": "智能体的日志粒度就是采样率；粒度不对，问题和证据会一起消失。",
+      "migrateType": "analogy",
+      "practiceStages": [
+        "measurement",
+        "observation"
+      ],
+      "claimIds": [
+        "c.sampling.1",
+        "c.sampling.2"
+      ],
+      "sourceIds": [
+        "s.nyquist1928",
+        "s.shannon1948"
+      ],
+      "compat": {
+        "legacyIds": []
+      }
+    },
+    {
+      "id": "measurement",
+      "groupId": "g4",
+      "kind": "concept",
+      "title": "测量与可观测性",
+      "aliases": [
+        "测量",
+        "measurement",
+        "可观测性",
+        "observability",
+        "标定",
+        "calibration",
+        "噪声",
+        "noise"
+      ],
+      "era": "—",
+      "eraStart": null,
+      "eraEnd": null,
+      "eraPrecision": "unknown",
+      "def": "测量是把状态映射成可比较的量；不可观测的状态，控制不了，也验证不了。",
+      "can": "区分「测到的」与「推断的」，并指出一次通过能支持到哪一步结论。",
+      "mech": "有限测试通过只支持「在测过的输入上正确」，不自动支持「机制正确」；在形式模型中，可观测性由可观性矩阵的秩判定。",
+      "limits": "不可观测不等于不存在；它只意味着你现在无法据此行动。",
+      "counter": "「测试全绿」被当成「功能正确」——这是从有限观测跳到普遍结论。",
+      "check": "给一段「全部测试通过」的报告，写出三条它没有支持的主张。",
+      "hist": "控制论把「观测」当作回路的一环而不是旁观；这也是黑箱方法的起点。",
+      "migrate": "任务契约的「验收证据」一栏必须写「什么证据算够」，而不只是「跑什么命令」。",
+      "migrateType": "application",
+      "practiceStages": [
+        "measurement",
+        "observation",
+        "acceptance"
+      ],
+      "claimIds": [
+        "c.measurement.1",
+        "c.measurement.2",
+        "c.measurement.3"
+      ],
+      "sourceIds": [
+        "s.ashby1956",
+        "s.kalman1960",
+        "s.astrom2008",
+        "s.author-practice"
+      ],
+      "compat": {
+        "legacyIds": []
+      }
+    },
+    {
+      "id": "blackbox",
+      "groupId": "g4",
+      "kind": "concept",
+      "title": "黑箱",
+      "aliases": [
+        "黑箱",
+        "black box",
+        "黑箱方法"
+      ],
+      "era": "1956",
+      "eraStart": 1956,
+      "eraEnd": 1956,
+      "eraPrecision": "year",
+      "def": "不打开内部，只用「输入—输出」的对应建立可操作的行为模型。",
+      "can": "设计一组输入去逼出一个系统的行为边界，而不是猜它的实现。",
+      "mech": "黑箱方法是让步：得到可操作性，失去解释。它可以告诉你「会怎样」，不告诉你「为什么」。",
+      "limits": "输入空间没覆盖到的区域，黑箱模型不给任何保证。",
+      "counter": "对一个 LLM 反复试同一类提示，得到稳定行为就宣称「它理解了」——超出输入覆盖范围立刻失效。",
+      "check": "设计 5 个输入去区分「参数没传对」与「逻辑写错了」两种解释。",
+      "hist": "艾什比在《控制论导论》（1956）第 6 章系统化了黑箱方法，它也解释了为什么控制论可以跨学科迁移。",
+      "migrate": "调试智能体时，你面对的通常是黑箱；证据设计比内部猜测更有效。",
+      "migrateType": "application",
+      "practiceStages": [
+        "measurement",
+        "observation"
+      ],
+      "claimIds": [
+        "c.blackbox.1",
+        "c.blackbox.2"
+      ],
+      "sourceIds": [
+        "s.ashby1956",
+        "s.author-practice"
+      ],
+      "compat": {
+        "legacyIds": []
+      }
+    },
+    {
+      "id": "homeostat",
+      "groupId": "g4",
+      "kind": "device",
+      "title": "稳态器 Homeostat",
+      "aliases": [
+        "稳态器",
+        "Homeostat",
+        "homeostat",
+        "超稳定性",
+        "ultrastability"
+      ],
+      "era": "1948–1952",
+      "eraStart": 1948,
+      "eraEnd": 1952,
+      "eraPrecision": "range",
+      "def": "四个耦合电磁单元，被推离平衡后会自己找回一个新的稳定状态。",
+      "can": "解释「适应」为什么可以不需要记忆和智能，只需要合适的结构。",
+      "mech": "单元之间的耦合方式决定了系统能找到哪些稳定点；改变耦合，就是改变它「能适应什么」。",
+      "limits": "它只维持稳定，不追求目标；把它当成「有目的」是过度解读。",
+      "counter": "把稳态器当作「机器会思考」的证据——它证明的是结构足以产生适应。",
+      "check": "用一句话区分「维持稳定」与「追求目标」，并举一个只有前者没有后者的例子。",
+      "hist": "艾什比在《大脑设计》（1952）中描述 Homeostat 并用「超稳定性」论证适应行为；装置常被记为 1948 年作出，本包把年份范围标为 1948–1952，未核到装置首发的一手日期。",
+      "migrate": "智能体的「自我修正」多数是稳态式的：回到能通过测试的状态，不等于达成了目标。",
+      "migrateType": "analogy",
+      "practiceStages": [
+        "observation",
+        "revision"
+      ],
+      "claimIds": [
+        "c.homeostat.1",
+        "c.homeostat.2"
+      ],
+      "sourceIds": [
+        "s.ashby1952"
+      ],
+      "compat": {
+        "legacyIds": []
+      }
+    },
+    {
+      "id": "shannon",
+      "groupId": "g4",
+      "kind": "concept",
+      "title": "香农：信息与信道容量",
+      "aliases": [
+        "香农",
+        "Shannon",
+        "shannon",
+        "信息论",
+        "information theory",
+        "信道容量",
+        "信息熵"
+      ],
+      "era": "1948",
+      "eraStart": 1948,
+      "eraEnd": 1948,
+      "eraPrecision": "year",
+      "def": "香农把通信的基本问题定义为：在另一地点复现选定的消息；可靠传输与信息量可以被度量，但意义与真实性不在这个度量里。",
+      "can": "区分可靠传输、信息量、意义与真实性，指出一次「信息更多」不等于「判断更对」。",
+      "mech": "信息量由消息集合的概率结构决定；信道容量给出可靠传输的上限，编码可以在该上限内逼近无错传输。",
+      "limits": "香农熵不度量知识价值、事实准确性或理解程度；「语义」在 1948 年论文里被明确排除在工程问题之外。",
+      "counter": "把「日志更多、数据更大」当作「认识更充分」——传输与容量增加，不保证区分了关键状态。",
+      "check": "构造一个例子：信息传输完全准确，但决策仍然错误。说明错在哪一环。",
+      "hist": "1948 年论文《通信的数学理论》发表于 Bell System Technical Journal；它与奈奎斯特 1928 年的采样/传输工作共同构成信号与信息传统，但问题定义不同。",
+      "migrate": "在任务契约里把「需要传什么信息」与「要据此判断什么」分开写，避免用日志量代替判据。",
+      "migrateType": "analogy",
+      "practiceStages": [
+        "measurement",
+        "acceptance"
+      ],
+      "claimIds": [
+        "c.shannon.1",
+        "c.shannon.2",
+        "c.shannon.3"
+      ],
+      "sourceIds": [
+        "s.shannon1948",
+        "s.nyquist1928"
+      ],
+      "compat": {
+        "legacyIds": []
+      }
+    },
+    {
+      "id": "actuator",
+      "groupId": "g5",
+      "kind": "concept",
+      "title": "行动能力与饱和",
+      "aliases": [
+        "执行器饱和",
+        "saturation",
+        "行动上限",
+        "权限",
+        "actuator"
+      ],
+      "era": "—",
+      "eraStart": null,
+      "eraEnd": null,
+      "eraPrecision": "unknown",
+      "def": "回路能施加的改变总有上限；到了上限，再大的误差也换不来更大的动作。",
+      "can": "判断一次失控是「策略错了」还是「动作不够」。",
+      "mech": "饱和之后，控制器对被控对象的多样性归零：它只能给出同一个最大动作。",
+      "limits": "提高上限往往有代价（成本、副作用、权限），不是总能做。",
+      "counter": "限流被触发后，再优化调度也没用——瓶颈在动作上限，不在算法。",
+      "check": "找出一个「加了资源也解决不了」的故障，说明它的动作上限在哪里。",
+      "hist": "伺服系统的饱和问题贯穿工程控制论；钱学森《工程控制论》（1954）把它放在工程可计算的位置上（本包未读全书，标 secondary）。",
+      "migrate": "智能体的权限就是它的动作上限；先看它能不能做，再看它做得对不对。",
+      "migrateType": "application",
+      "practiceStages": [
+        "goal",
+        "action"
+      ],
+      "claimIds": [
+        "c.actuator.1",
+        "c.actuator.2"
+      ],
+      "sourceIds": [
+        "s.astrom2008",
+        "s.kalman1960",
+        "s.tsien1954",
+        "s.author-practice"
+      ],
+      "compat": {
+        "legacyIds": []
+      }
+    },
+    {
+      "id": "adaptation",
+      "groupId": "g5",
+      "kind": "concept",
+      "title": "适应与换规则",
+      "aliases": [
+        "适应",
+        "adaptation",
+        "换规则",
+        "学习"
+      ],
+      "era": "1952",
+      "eraStart": 1952,
+      "eraEnd": 1952,
+      "eraPrecision": "year",
+      "def": "当一条规则在变化的环境里持续失效，正确的动作不是加大力度，而是换一条规则。",
+      "can": "分辨「参数不对」与「规则不对」，并说出判据。",
+      "mech": "参数在规则内搜索，适应在规则外搜索；前者收敛快，后者能跳出局部最优。",
+      "limits": "换规则有代价：旧证据失效，需要重新建立基线。频繁换规则等于没有规则。",
+      "counter": "连续三次调参都只能让指标小幅波动，却仍在调参——该换规则了。",
+      "check": "列出「参数问题」与「规则问题」各三个可观察特征。",
+      "hist": "艾什比在《大脑设计》（1952）中把适应刻画为系统在参数层搜索以维持基本变量；早期「学习机器」传统也在同一时期展开。",
+      "migrate": "智能体连续两轮在同一处失败时，改任务契约（换规则），不要继续重试（调参）。",
+      "migrateType": "analogy",
+      "practiceStages": [
+        "revision",
+        "acceptance"
+      ],
+      "claimIds": [
+        "c.adaptation.1",
+        "c.adaptation.2"
+      ],
+      "sourceIds": [
+        "s.ashby1952",
+        "s.author-practice"
+      ],
+      "compat": {
+        "legacyIds": []
+      }
+    },
+    {
+      "id": "pi",
+      "groupId": "g5",
+      "kind": "concept",
+      "title": "比例与积分（P / I）",
+      "aliases": [
+        "PID",
+        "pid",
+        "比例积分",
+        "proportional integral",
+        "PI"
+      ],
+      "era": "1922",
+      "eraStart": 1922,
+      "eraEnd": 1922,
+      "eraPrecision": "year",
+      "def": "按当前误差出力（P），把历史误差累积起来出力（I）。两者解决不同的问题。",
+      "can": "解释「一直差一点点」和「来回摆」分别对应哪个环节缺失或过量。",
+      "mech": "积分项消除稳态误差，代价是引入记忆和相位滞后；比例项反应快，代价是留残差并易过冲。",
+      "limits": "积分会「记仇」：长期的小偏差累积起来会突然发力，产生大过冲。",
+      "counter": "加了积分后残差消失，但启动时猛冲过去——积分饱和。",
+      "check": "在实验 delay 里只开 P、再加 I，记录两种情况下最终停在离目标多远。",
+      "hist": "米诺尔斯基 1922 年研究船舶操舵的自动控制，给出比例/积分作用的早期工程表述，是 PID 思想可查的源头之一。",
+      "migrate": "「记住上次失败」是给智能体加积分项：它会让它过度补偿很久以前的错误。",
+      "migrateType": "analogy",
+      "practiceStages": [
+        "action",
+        "observation",
+        "revision"
+      ],
+      "claimIds": [
+        "c.pi.1",
+        "c.pi.2"
+      ],
+      "sourceIds": [
+        "s.minorsky1922",
+        "s.astrom2008"
+      ],
+      "compat": {
+        "legacyIds": []
+      }
+    },
+    {
+      "id": "controllability",
+      "groupId": "g5",
+      "kind": "concept",
+      "title": "可控性与作用通道",
+      "aliases": [
+        "可控性",
+        "controllability",
+        "Kalman rank",
+        "作用通道",
+        "可观测性边界"
+      ],
+      "era": "1960",
+      "eraStart": 1960,
+      "eraEnd": 1960,
+      "eraPrecision": "year",
+      "def": "可控性问的是：在给定模型下，是否存在一组输入能把状态带到想要的地方；可观测性问的是：能否从输出推断内部状态。",
+      "can": "区分「能看见」与「能改变」，指出缺的是观测通道还是作用通道。",
+      "mech": "线性时不变系统有形式判据：状态完全可控当且仅当可控性矩阵满秩；可观测性由可观性矩阵判定。",
+      "limits": "可控性是模型内的形式性质：工具可用、权限存在，也不保证目标可达；形式模型与真实工程之间需要额外论证。",
+      "counter": "「我们有这个工具，所以能修」——工具存在不等于存在一条在时限内可达目标的作用路径。",
+      "check": "描述一个能检测却无权限修改的故障，写出新增权限的收益与代价。",
+      "hist": "卡尔曼 1960 年把可控性与可观测性建立在状态空间描述上；此后的工程控制论把它们作为设计前提。",
+      "migrate": "给智能体列权限时，同时写「它能看到什么」与「它能改什么」，两者缺一都会让任务失败。",
+      "migrateType": "application",
+      "practiceStages": [
+        "goal",
+        "action",
+        "measurement"
+      ],
+      "claimIds": [
+        "c.controllability.1",
+        "c.controllability.2",
+        "c.controllability.3"
+      ],
+      "sourceIds": [
+        "s.kalman1960",
+        "s.astrom2008",
+        "s.author-practice"
+      ],
+      "compat": {
+        "legacyIds": []
+      }
+    },
+    {
+      "id": "model",
+      "groupId": "g6",
+      "kind": "concept",
+      "title": "模型与前馈",
+      "aliases": [
+        "模型",
+        "model",
+        "前馈",
+        "feedforward",
+        "预测"
+      ],
+      "era": "1970",
+      "eraStart": 1970,
+      "eraEnd": 1970,
+      "eraPrecision": "year",
+      "def": "不等结果发生，就按对系统的预测先动手；预测来自模型。",
+      "can": "判断一次「提前处理」是靠模型还是靠运气，并指出模型可能在哪里错。",
+      "mech": "前馈不看结果，所以快；但它错了没有自我纠正，误差会一路带下去。",
+      "limits": "模型越复杂，覆盖越好，成本越高，且不可解释风险上升。",
+      "counter": "缓存「用户即将搜索什么」猜错了，问题不在缓存，在模型。",
+      "check": "为一个前馈式优化写出它的失效条件，以及用来兜底的反馈是什么。",
+      "hist": "康南特与艾什比 1970 年的论文《每一个好的调节器都必须是系统的模型》把模型与调节的形式关系摆上台面（本包未读全文，标 secondary）。",
+      "migrate": "给智能体写「请预判用户意图」时，同时写「预判失败时如何回退」。",
+      "migrateType": "heuristic",
+      "practiceStages": [
+        "goal",
+        "action",
+        "acceptance"
+      ],
+      "claimIds": [
+        "c.model.1",
+        "c.model.2"
+      ],
+      "sourceIds": [
+        "s.conantashby1970",
+        "s.astrom2008"
+      ],
+      "compat": {
+        "legacyIds": []
+      }
+    },
+    {
+      "id": "robust",
+      "groupId": "g6",
+      "kind": "concept",
+      "title": "鲁棒性与代价",
+      "aliases": [
+        "鲁棒性",
+        "robustness",
+        "robust",
+        "脆弱性"
+      ],
+      "era": "—",
+      "eraStart": null,
+      "eraEnd": null,
+      "eraPrecision": "unknown",
+      "def": "在参数漂移、噪声和未建模情况下仍能工作的能力，用性能换来的。",
+      "can": "指出一次「更稳」的改动牺牲了什么。",
+      "mech": "鲁棒性通常来自降低增益、增加冗余或放宽要求；三者都在别处付账。",
+      "limits": "鲁棒设计不覆盖「没被想到的扰动类型」；它保证的是设计时想到的那一类。",
+      "counter": "加了重试让系统「更稳」，却放大了下游的重复写入。",
+      "check": "给一个「加超时」的改动，写出它在什么情况下让系统更脆弱。",
+      "hist": "工程控制论把「不确定条件下的可用性」作为核心工程问题之一（钱学森 1954；本包未读全书）。",
+      "migrate": "智能体的「多重兜底」常常把故障从显性变成隐性，写契约时要标注代价。",
+      "migrateType": "analogy",
+      "practiceStages": [
+        "acceptance",
+        "revision"
+      ],
+      "claimIds": [
+        "c.robust.1",
+        "c.robust.2"
+      ],
+      "sourceIds": [
+        "s.astrom2008",
+        "s.tsien1954",
+        "s.author-practice"
+      ],
+      "compat": {
+        "legacyIds": []
+      }
+    },
+    {
+      "id": "tradeoff",
+      "groupId": "g6",
+      "kind": "concept",
+      "title": "误差与代价的取舍",
+      "aliases": [
+        "取舍",
+        "trade-off",
+        "tradeoff",
+        "代价",
+        "多目标"
+      ],
+      "era": "—",
+      "eraStart": null,
+      "eraEnd": null,
+      "eraPrecision": "unknown",
+      "def": "控制从来不追求零误差，而是在「误差」与「纠正代价」之间选一个点。",
+      "can": "把一个「要不要修」的争论改写成取舍，并说出谁承担代价。",
+      "mech": "提高精度需要更频繁的测量与更激进的执行，两者都有成本和副作用。",
+      "limits": "有些事情没有可接受误差（数据丢失），这时取舍变成硬约束。",
+      "counter": "为了消除 0.1% 的抖动引入的补偿逻辑，带来了更频繁的误触发。",
+      "check": "为一个「偶发 200ms 卡顿」列出三种处理程度及其各自代价。",
+      "hist": "控制论的工程传统里，最优控制显式地把「性能指标」写成代价函数；维纳也从社会后果角度讨论过「效率」不是唯一目标。",
+      "migrate": "任务契约必须写「可在哪里慢、哪里不能慢」，否则智能体会均匀用力。",
+      "migrateType": "application",
+      "practiceStages": [
+        "goal",
+        "acceptance"
+      ],
+      "claimIds": [
+        "c.tradeoff.1",
+        "c.tradeoff.2"
+      ],
+      "sourceIds": [
+        "s.astrom2008",
+        "s.wiener1948",
+        "s.wiener1950"
+      ],
+      "compat": {
+        "legacyIds": []
+      }
+    },
+    {
+      "id": "vsm",
+      "groupId": "g7",
+      "kind": "concept",
+      "title": "生存系统模型 VSM",
+      "aliases": [
+        "VSM",
+        "vsm",
+        "比尔",
+        "beer",
+        "生存系统模型",
+        "viable system model"
+      ],
+      "era": "1972",
+      "eraStart": 1972,
+      "eraEnd": 1972,
+      "eraPrecision": "year",
+      "def": "任何一个能活下去的组织，都必须同时具备五个功能：执行、协调、优化、前瞻、身份。",
+      "can": "用一个组织的缺失功能解释它反复出现的协调失败。",
+      "mech": "五个功能递归地出现在每一层：每个子系统内部也要有这五个。",
+      "limits": "它是诊断框架，不是组织结构图；套进真实公司会丢掉权力与历史。",
+      "counter": "把 VSM 当成「五个部门」来建，结果多了一层官僚。",
+      "check": "给一个三人团队，指出它的「前瞻」功能目前由谁承担。",
+      "hist": "比尔的《企业的大脑》（1972）提出 VSM，并在智利 Cybersyn 项目中实践。",
+      "migrate": "把 VSM 当作检查表：智能体工作流缺的通常是「前瞻」与「身份」。",
+      "migrateType": "analogy",
+      "practiceStages": [
+        "goal",
+        "action",
+        "acceptance"
+      ],
+      "claimIds": [
+        "c.vsm.1",
+        "c.vsm.2"
+      ],
+      "sourceIds": [
+        "s.beer1972",
+        "s.author-practice"
+      ],
+      "compat": {
+        "legacyIds": []
+      }
+    },
+    {
+      "id": "cybersyn",
+      "groupId": "g7",
+      "kind": "event",
+      "title": "Cybersyn 与 1973",
+      "aliases": [
+        "Cybersyn",
+        "cybersyn",
+        "1973",
+        "智利",
+        "协同控制"
+      ],
+      "era": "1971–1973",
+      "eraStart": 1971,
+      "eraEnd": 1973,
+      "eraPrecision": "range",
+      "def": "1971–73 年智利试图用实时数据管理国民经济：电传机、统计预测、一个可以决策的房间。",
+      "can": "说出一个实时控制系统的社会前提，以及它为什么可以被政治终止。",
+      "mech": "系统只覆盖接入电传的工厂；未接入的部分对系统不可见，因此「全国」是统计意义上的。",
+      "limits": "技术方案无法解决它所在制度的冲突；系统本身没有保卫自己的能力。",
+      "counter": "把它当作「技术被暴力打断」的纯粹故事——它同时受限于数据覆盖与政治授权。",
+      "check": "列出这个系统的三个观测盲区，并说明每一个会怎样影响决策。",
+      "hist": "1973 年 9 月 11 日智利政变，项目终止；房间保留，系统未再运行（Medina 2011）。",
+      "migrate": "任何「全量监控」都只覆盖被接入的部分；写契约时先问「谁没被接入」。",
+      "migrateType": "application",
+      "practiceStages": [
+        "goal",
+        "measurement",
+        "action",
+        "acceptance",
+        "revision"
+      ],
+      "claimIds": [
+        "c.cybersyn.1",
+        "c.cybersyn.2"
+      ],
+      "sourceIds": [
+        "s.medina2011"
+      ],
+      "compat": {
+        "legacyIds": []
+      }
+    },
+    {
+      "id": "indicator",
+      "groupId": "g7",
+      "kind": "concept",
+      "title": "指标与代理目标",
+      "aliases": [
+        "指标",
+        "代理指标",
+        "proxy",
+        "goodhart",
+        "古德哈特定律",
+        "indicator"
+      ],
+      "era": "1975",
+      "eraStart": 1975,
+      "eraEnd": 1975,
+      "eraPrecision": "year",
+      "def": "当指标成为目标，它就不再是好的指标。",
+      "can": "指出一个指标在什么条件下会与目的脱钩，并给出第二个独立指标。",
+      "mech": "代理目标可被优化，真目的不能；一旦优化压力落到代理上，代理与目的的偏差就会被放大。",
+      "limits": "不是说指标无用，而是说单一指标不可作为目的的证据。",
+      "counter": "覆盖率 100% 的测试，全部断言的实现而非行为。",
+      "check": "为「测试覆盖率」找一个独立指标，并说明两者何时相反。",
+      "hist": "古德哈特 1975 年讨论货币目标时指出：统计规律一旦被用于控制就会失效；「古德哈特定律」是后人的概括，不是原文定理。",
+      "migrate": "任务契约里必须写「除了这个指标，还要看什么」。",
+      "migrateType": "analogy",
+      "practiceStages": [
+        "measurement",
+        "acceptance"
+      ],
+      "claimIds": [
+        "c.indicator.1",
+        "c.indicator.2"
+      ],
+      "sourceIds": [
+        "s.goodhart1975",
+        "s.author-practice"
+      ],
+      "compat": {
+        "legacyIds": []
+      }
+    },
+    {
+      "id": "secondorder",
+      "groupId": "g8",
+      "kind": "concept",
+      "title": "二阶控制论",
+      "aliases": [
+        "二阶控制论",
+        "second-order cybernetics",
+        "secondorder",
+        "控制论的控制论"
+      ],
+      "era": "1974",
+      "eraStart": 1974,
+      "eraEnd": 1974,
+      "eraPrecision": "year",
+      "def": "控制论的控制论：研究「描述系统的那个观察者」如何进入系统描述。",
+      "can": "指出一次分析里，分析者自己的位置带来了哪一条结论。",
+      "mech": "一阶问「系统怎么调节」，二阶问「谁在设定目标、谁在判定成功」。",
+      "limits": "它不能替你做决定，只让你无法假装自己不在场。",
+      "counter": "「我们的评估完全中立」——忽略了评估标准由谁选定。",
+      "check": "写一段自我反驳：你的学习结论里，哪一条来自你的位置而非证据。",
+      "hist": "冯·福斯特与生物计算机实验室（BCL）推动了这一转向；1974 年会议文集是常见锚点（本包未读原件，标 unverified/secondary）。",
+      "migrate": "让智能体自评是二阶问题：它同时是执行者与判定者。",
+      "migrateType": "analogy",
+      "practiceStages": [
+        "observation",
+        "acceptance",
+        "revision"
+      ],
+      "claimIds": [
+        "c.secondorder.1",
+        "c.secondorder.2"
+      ],
+      "sourceIds": [
+        "s.foerster1974",
+        "s.heims1991",
+        "s.author-practice"
+      ],
+      "compat": {
+        "legacyIds": []
+      }
+    },
+    {
+      "id": "responsibility",
+      "groupId": "g8",
+      "kind": "concept",
+      "title": "责任与回路位置",
+      "aliases": [
+        "责任",
+        "responsibility",
+        "治理",
+        "governance",
+        "退出",
+        "可撤回性"
+      ],
+      "era": "1950",
+      "eraStart": 1950,
+      "eraEnd": 1950,
+      "eraPrecision": "year",
+      "def": "责任落在「有能力改变结果、且知道自己在回路里」的那一方。",
+      "can": "指出一个自动化失败里，谁在哪个位置有能力阻止它。",
+      "mech": "把人的检查点放在回路的末端（事后审批）只能追责，不能预防。",
+      "limits": "责任不能完全转移给系统，也不能无限集中于一个人。",
+      "counter": "「模型自己决定的」——但选择让它自主决定的是人。",
+      "check": "为一个自动发布流程，标出三个「可以拦住」的位置，并说明各自的成本。",
+      "hist": "维纳在《人有人的用处》（1950）中讨论自动化与人的位置，这是控制论最早的责任论述之一。",
+      "migrate": "任务契约必须写「人工检查点在哪里」，而不是「最后看一眼」。",
+      "migrateType": "application",
+      "practiceStages": [
+        "goal",
+        "acceptance",
+        "revision"
+      ],
+      "claimIds": [
+        "c.responsibility.1",
+        "c.responsibility.2"
+      ],
+      "sourceIds": [
+        "s.wiener1950",
+        "s.author-practice"
+      ],
+      "compat": {
+        "legacyIds": []
+      }
+    },
+    {
+      "id": "agentloop",
+      "groupId": "g8",
+      "kind": "concept",
+      "title": "编程智能体的回路",
+      "aliases": [
+        "编程智能体",
+        "coding agent",
+        "harness",
+        "contract",
+        "任务契约",
+        "evaluation",
+        "验收"
+      ],
+      "era": "2020s（作者判断）",
+      "eraStart": null,
+      "eraEnd": null,
+      "eraPrecision": "unknown",
+      "def": "智能体的工作本身是一条回路：读代码 → 改 → 跑 → 看结果 → 再改。",
+      "can": "把一次智能体任务画成回路，指出测量点、延迟与动作边界。",
+      "mech": "它的测量几乎总是「测试通过」，于是它的稳定性建立在你写的验收之上。",
+      "limits": "你不能控制它的内部推理；你能控制的是它看到的证据、它能做的动作、以及谁验收。",
+      "counter": "要求它「确保正确」而不给可判定的验收——它只能优化到「看起来对」。",
+      "check": "把一个真实需求写成回路图，标出三处证据缺口。",
+      "hist": "这是控制论问题在当代工程中的位置：本包把它作为工程迁移实例，而不是历史事实；相关主张标为作者判断。",
+      "migrate": "任务契约 = 给这条回路设定目标、测量、边界与停止条件。",
+      "migrateType": "application",
+      "practiceStages": [
+        "goal",
+        "measurement",
+        "action",
+        "observation",
+        "acceptance",
+        "revision"
+      ],
+      "claimIds": [
+        "c.agentloop.1",
+        "c.agentloop.2"
+      ],
+      "sourceIds": [
+        "s.author-practice"
+      ],
+      "compat": {
+        "legacyIds": []
+      }
+    }
+  ],
+  "relations": [
+    {
+      "id": "e.goal-feedback",
+      "from": "goal",
+      "to": "feedback",
+      "type": "prerequisite",
+      "claim": "反馈作为纠偏机制必须相对于一个目标量来定义；没有目标，'纠正'没有方向。",
+      "condition": "讨论调节或反馈机制时，先说明被维持的量。",
+      "cost": "把目标当作给定，会掩盖'目标由谁选择'这一价值问题。",
+      "claimIds": [
+        "c.rel.goal-feedback"
+      ],
+      "version": 1
+    },
+    {
+      "id": "e.boundary-goal",
+      "from": "boundary",
+      "to": "goal",
+      "type": "constraint",
+      "claim": "边界的划法决定哪些因素被算作可能改变目标量的扰动。",
+      "condition": "边界按'是否改变目标状态'来划，而不是按'看起来相关'来划。",
+      "cost": "边界划大增加解释与验证成本，划小会漏掉真实扰动。",
+      "claimIds": [
+        "c.rel.boundary-goal"
+      ],
+      "version": 1
+    },
+    {
+      "id": "e.observer-boundary",
+      "from": "observer",
+      "to": "boundary",
+      "type": "constraint",
+      "claim": "边界由观察者切分：观察位置决定哪些因素被看见、哪些被排除。",
+      "condition": "任何一次系统描述都带着描述者的位置。",
+      "cost": "要求写明观察位置会增加描述成本，但能避免'客观中立'的错觉。",
+      "claimIds": [
+        "c.rel.observer-boundary"
+      ],
+      "version": 1
+    },
+    {
+      "id": "e.observer-secondorder",
+      "from": "observer",
+      "to": "secondorder",
+      "type": "historical",
+      "claim": "二阶控制论把'观察者进入描述'从背景推到前台；这是历史发展，不是同一概念。",
+      "condition": "讨论控制论的认识论转向时（1970s 之后）。",
+      "cost": "把二阶问题当一阶问题处理，会漏掉'判定标准由谁设定'。",
+      "claimIds": [
+        "c.rel.observer-secondorder"
+      ],
+      "version": 1
+    },
+    {
+      "id": "e.state-measurement",
+      "from": "state",
+      "to": "measurement",
+      "type": "prerequisite",
+      "claim": "要讨论测量与可观测性，先要有状态、输入、输出的描述。",
+      "condition": "使用形式模型讨论可观测性时。",
+      "cost": "状态选择本身是建模决定，会限制后续能问的问题。",
+      "claimIds": [
+        "c.rel.state-measurement"
+      ],
+      "version": 1
+    },
+    {
+      "id": "e.state-controllability",
+      "from": "state",
+      "to": "controllability",
+      "type": "prerequisite",
+      "claim": "可控性的形式定义建立在状态空间模型上：没有状态描述，就无法谈'到达某个状态'。",
+      "condition": "使用线性时不变状态空间模型时。",
+      "cost": "状态空间假设在软件工程里通常需要额外建模，不能直接照搬。",
+      "claimIds": [
+        "c.rel.state-controllability"
+      ],
+      "version": 1
+    },
+    {
+      "id": "e.state-stability",
+      "from": "state",
+      "to": "stability",
+      "type": "prerequisite",
+      "claim": "稳定性的讨论需要先说明系统状态如何随时间变化（动态描述）。",
+      "condition": "用轨迹或方程讨论稳定/收敛/发散时。",
+      "cost": "模型简化会决定你能看见哪类不稳定。",
+      "claimIds": [
+        "c.rel.state-stability"
+      ],
+      "version": 1
+    },
+    {
+      "id": "e.boundary-agentloop",
+      "from": "boundary",
+      "to": "agentloop",
+      "type": "application",
+      "claim": "系统边界的判断被迁移到任务契约的'非目标'与'不进入验收'一栏；这是工程应用，不是理论等价。",
+      "condition": "给编程智能体写任务契约时。",
+      "cost": "把边界写死会降低适应性；边界要随着验收证据修订。",
+      "claimIds": [
+        "c.rel.boundary-agentloop"
+      ],
+      "version": 1
+    },
+    {
+      "id": "e.goal-agentloop",
+      "from": "goal",
+      "to": "agentloop",
+      "type": "application",
+      "claim": "可判定的目标量被迁移成任务契约的'期望行为'；这是工程应用。",
+      "condition": "把需求改写成可验收的行为描述时。",
+      "cost": "过早固定目标可能把未想清的价值选择伪装成技术选择。",
+      "claimIds": [
+        "c.rel.goal-agentloop"
+      ],
+      "version": 1
+    },
+    {
+      "id": "e.wiener-feedback",
+      "from": "wiener",
+      "to": "feedback",
+      "type": "historical",
+      "claim": "维纳等人的 1943 年论文把目的性行为解释为负反馈控制；这是历史影响与思想来源，不是把两者等同。",
+      "condition": "讨论反馈概念的历史来源时。",
+      "cost": "把'目的性=负反馈'当成当代智能的定义，会跳过更多必要的条件。",
+      "claimIds": [
+        "c.rel.wiener-feedback"
+      ],
+      "version": 1
+    },
+    {
+      "id": "e.wiener-responsibility",
+      "from": "wiener",
+      "to": "responsibility",
+      "type": "historical",
+      "claim": "维纳 1950 年的社会论述把自动化后果带进控制论议题；这是历史影响。",
+      "condition": "讨论自动化与责任的历史脉络时。",
+      "cost": "历史论述不能直接当作当代工程治理方案。",
+      "claimIds": [
+        "c.rel.wiener-responsibility"
+      ],
+      "version": 1
+    },
+    {
+      "id": "e.wiener-macy",
+      "from": "wiener",
+      "to": "macy",
+      "type": "historical",
+      "claim": "维纳是梅西会议网络中的关键参与者之一；这是历史语境（历史影响线索），不是同一机制，不能推出「会议等于维纳学说」。",
+      "condition": "讨论控制论形成期的学术网络时。",
+      "cost": "过度强调单一作者会掩盖多学科争论与后续分歧。",
+      "claimIds": [
+        "c.rel.wiener-macy"
+      ],
+      "version": 1
+    },
+    {
+      "id": "e.wiener-shannon",
+      "from": "wiener",
+      "to": "shannon",
+      "type": "historical",
+      "claim": "1948 年两部著作在通信/信息议题上相关，但问题与定义不同；这是历史语境，不是同一机制。",
+      "condition": "比较控制论与信息论的传统时。",
+      "cost": "把两者混为同一定理会掩盖'意义是否在度量内'的关键差别。",
+      "claimIds": [
+        "c.rel.wiener-shannon"
+      ],
+      "version": 1
+    },
+    {
+      "id": "e.wiener-delay",
+      "from": "wiener",
+      "to": "delay",
+      "type": "historical",
+      "claim": "维纳与比格罗的防空预测器研究把延迟与人机回路问题推到前台；这是历史影响。",
+      "condition": "讨论延迟问题在控制论起源中的位置时。",
+      "cost": "历史情境不能直接给出当代系统的延迟参数。",
+      "claimIds": [
+        "c.rel.wiener-delay"
+      ],
+      "version": 1
+    },
+    {
+      "id": "e.feedback-stability",
+      "from": "feedback",
+      "to": "stability",
+      "type": "formal",
+      "claim": "在满足线性时不变、单回路、开环无右半平面极点等前提时，闭环稳定性由环路频率响应的 Nyquist 判据判定；'负反馈'本身不蕴含稳定。",
+      "condition": "线性时不变单回路模型，且满足 Nyquist 判据的适用前提（前提写在 claim 与来源说明里）。",
+      "cost": "判据依赖模型；把 Nyquist 判据直接套到非线性、时变或强饱和系统是误用。",
+      "claimIds": [
+        "c.rel.feedback-stability"
+      ],
+      "version": 1
+    },
+    {
+      "id": "e.feedback-measurement",
+      "from": "feedback",
+      "to": "measurement",
+      "type": "constraint",
+      "claim": "反馈只能纠正它测到的量；测量选择决定回路能稳定地维持什么。",
+      "condition": "任何以测量为输入的纠偏回路。",
+      "cost": "增加测量点有成本；只测容易测的量会让回路稳定地偏离目的。",
+      "claimIds": [
+        "c.rel.feedback-measurement"
+      ],
+      "version": 1
+    },
+    {
+      "id": "e.feedback-model",
+      "from": "feedback",
+      "to": "model",
+      "type": "formal",
+      "claim": "在 Conant–Ashby 的有限系统与'良好调节'定义下，任何好的调节器都必须是该系统的模型（存在同态关系）。",
+      "condition": "形式定理的有限系统前提内；调节器结果集合包含于系统结果集合。",
+      "cost": "定理给的是模型的存在/同态关系，不保证模型可解释、可计算或工程可用。",
+      "claimIds": [
+        "c.rel.feedback-model"
+      ],
+      "version": 1
+    },
+    {
+      "id": "e.feedback-positive",
+      "from": "feedback",
+      "to": "positive",
+      "type": "parallel",
+      "claim": "负反馈与正反馈是同一回路结构在符号上的两种情形；不是两种独立机制。",
+      "condition": "在线性近似或小偏差分析下比较两种极性时。",
+      "cost": "只按符号判断稳定性会忽略频率与阻尼带来的反转。",
+      "claimIds": [
+        "c.rel.feedback-positive"
+      ],
+      "version": 1
+    },
+    {
+      "id": "e.variety-feedback",
+      "from": "variety",
+      "to": "feedback",
+      "type": "formal",
+      "claim": "Ashby 必要多样性定律：给定扰动集合与调节器反应集合，若反应的有效多样性小于扰动的多样性，则不存在能抵消全部扰动的调节器；反馈回路的调节能力受其可区分状态数限制。",
+      "condition": "有限状态集合、确定性调节器（Ashby 1956 第 11 章的前提）。",
+      "cost": "增大多样性有成本，且'动作数'不等于'有效多样性'。",
+      "claimIds": [
+        "c.rel.variety-feedback"
+      ],
+      "version": 1
+    },
+    {
+      "id": "e.positive-indicator",
+      "from": "positive",
+      "to": "indicator",
+      "type": "analogy",
+      "claim": "指标优化可以形成正反馈式的放大环；这是类比，不是同一机制。",
+      "condition": "代理指标可被持续优化且衡量成本低时。",
+      "cost": "把类比当机制解释，会跳过'指标与目的如何脱钩'的证据。",
+      "claimIds": [
+        "c.rel.positive-indicator"
+      ],
+      "version": 1
+    },
+    {
+      "id": "e.macy-feedback",
+      "from": "macy",
+      "to": "feedback",
+      "type": "historical",
+      "claim": "梅西会议把反馈与循环因果作为跨学科议题讨论；这是历史语境，各学科对'反馈'的定义并不相同。",
+      "condition": "讨论控制论概念如何跨学科传播时。",
+      "cost": "会议记录中的类比不能直接当作统一理论。",
+      "claimIds": [
+        "c.rel.macy-feedback"
+      ],
+      "version": 1
+    },
+    {
+      "id": "e.macy-observer",
+      "from": "macy",
+      "to": "observer",
+      "type": "historical",
+      "claim": "二阶控制论与梅西会议网络有人员与议题上的历史关联；这是历史影响，不能推出会议直接产生了二阶控制论。",
+      "condition": "讨论观察者问题在控制论史中的出现时。",
+      "cost": "把网络关联当因果会夸大单一会议的贡献。",
+      "claimIds": [
+        "c.rel.macy-observer"
+      ],
+      "version": 1
+    },
+    {
+      "id": "e.delay-stability",
+      "from": "delay",
+      "to": "stability",
+      "type": "constraint",
+      "claim": "延迟把纠偏作用推迟到偏差已经变化之后，可用增益因此受压；同一增益可随延迟从收敛变为振荡。",
+      "condition": "一阶惯性加纯延迟等典型模型；具体边界随模型与参数变化。",
+      "cost": "降低增益会变慢；把延迟当噪声处理会掩盖结构性振荡。",
+      "claimIds": [
+        "c.rel.delay-stability"
+      ],
+      "version": 1
+    },
+    {
+      "id": "e.delay-pi",
+      "from": "delay",
+      "to": "pi",
+      "type": "constraint",
+      "claim": "积分项在延迟下增加相位滞后，使可用增益进一步下降，并放大积分饱和造成的过冲。",
+      "condition": "有执行器饱和且延迟明显的回路。",
+      "cost": "为防滞后而减小积分会留下稳态误差。",
+      "claimIds": [
+        "c.rel.delay-pi"
+      ],
+      "version": 1
+    },
+    {
+      "id": "e.sampling-measurement",
+      "from": "sampling",
+      "to": "measurement",
+      "type": "formal",
+      "claim": "Nyquist–Shannon 采样定理：对最高频率为 B 的带限信号，以 fs>2B 均匀采样可由样本完全重建；否则发生混叠。",
+      "condition": "带限信号、理想均匀采样、无限精度样本等前提。",
+      "cost": "现实系统的带限假设、量化与抖动使定理只能近似成立。",
+      "claimIds": [
+        "c.rel.sampling-measurement"
+      ],
+      "version": 1
+    },
+    {
+      "id": "e.shannon-sampling",
+      "from": "shannon",
+      "to": "sampling",
+      "type": "historical",
+      "claim": "采样定理来自奈奎斯特-香农传统：香农 1948 年给出正式表述；这是历史影响，与香农的通信容量问题不是同一问题。",
+      "condition": "追溯采样定理的来源时。",
+      "cost": "把采样定理与信道容量定理混为一条会丢失各自的前提。",
+      "claimIds": [
+        "c.rel.shannon-sampling"
+      ],
+      "version": 1
+    },
+    {
+      "id": "e.shannon-variety",
+      "from": "shannon",
+      "to": "variety",
+      "type": "parallel",
+      "claim": "香农熵与艾什比多样性都度量'可能状态/消息的数量'，但一个是概率分布下的平均不确定性，一个是状态集合的计数；不是同一件事。",
+      "condition": "在两者各自的形式定义内比较时。",
+      "cost": "混用两者会把'不确定性'与'可区分状态数'当成同一指标。",
+      "claimIds": [
+        "c.rel.shannon-variety"
+      ],
+      "version": 1
+    },
+    {
+      "id": "e.shannon-measurement",
+      "from": "shannon",
+      "to": "measurement",
+      "type": "constraint",
+      "claim": "信息量/信道容量不度量语义、真实性与测量有效性；信息更多不等于认识更充分。",
+      "condition": "讨论日志量、数据量或通道带宽是否等于证据时。",
+      "cost": "排除语义使工程可计算，但也意味着工程指标不能直接回答'内容是否有价值'。",
+      "claimIds": [
+        "c.rel.shannon-measurement"
+      ],
+      "version": 1
+    },
+    {
+      "id": "e.measurement-blackbox",
+      "from": "measurement",
+      "to": "blackbox",
+      "type": "prerequisite",
+      "claim": "黑箱方法以输入—输出的可重复测量为前提。",
+      "condition": "只凭外部行为建立模型时。",
+      "cost": "测量设计的偏差会被黑箱模型原样继承。",
+      "claimIds": [
+        "c.rel.measurement-blackbox"
+      ],
+      "version": 1
+    },
+    {
+      "id": "e.blackbox-model",
+      "from": "blackbox",
+      "to": "model",
+      "type": "parallel",
+      "claim": "黑箱行为模型与机制模型是两类模型：一个可操作，一个可解释；不是同一件事。",
+      "condition": "比较'会怎样'与'为什么'两类解释时。",
+      "cost": "把行为模型当成机制解释，会高估覆盖范围。",
+      "claimIds": [
+        "c.rel.blackbox-model"
+      ],
+      "version": 1
+    },
+    {
+      "id": "e.homeostat-stability",
+      "from": "homeostat",
+      "to": "stability",
+      "type": "application",
+      "claim": "稳态器把'搜索稳定状态'做成可运行的装置；这是装置级应用，不是稳定性的一般证明。",
+      "condition": "讨论装置如何演示稳定点搜索时。",
+      "cost": "装置行为不能直接推广到其他系统。",
+      "claimIds": [
+        "c.rel.homeostat-stability"
+      ],
+      "version": 1
+    },
+    {
+      "id": "e.homeostat-adaptation",
+      "from": "homeostat",
+      "to": "adaptation",
+      "type": "historical",
+      "claim": "Homeostat 是 Ashby 论证适应行为的示范装置；这是历史影响与示范，不是'任何适应都等于超稳定性'。",
+      "condition": "追溯适应概念的历史来源时。",
+      "cost": "把超稳定性等同于一切学习或自适应，会掩盖现代方法的差异。",
+      "claimIds": [
+        "c.rel.homeostat-adaptation"
+      ],
+      "version": 1
+    },
+    {
+      "id": "e.measurement-controllability",
+      "from": "measurement",
+      "to": "controllability",
+      "type": "constraint",
+      "claim": "可观测性不等于可控性：能推断状态不代表存在足够的作用通道。",
+      "condition": "在状态空间模型中同时讨论观测与作用时。",
+      "cost": "增加观测不自动增加行动能力，反之亦然。",
+      "claimIds": [
+        "c.rel.measurement-controllability"
+      ],
+      "version": 1
+    },
+    {
+      "id": "e.actuator-pi",
+      "from": "actuator",
+      "to": "pi",
+      "type": "constraint",
+      "claim": "执行器饱和时积分项仍在累积误差（积分饱和），恢复时会过冲。",
+      "condition": "有饱和执行器且积分项持续累积误差时。",
+      "cost": "防饱和设计（限幅/回算）增加实现复杂度。",
+      "claimIds": [
+        "c.rel.actuator-pi"
+      ],
+      "version": 1
+    },
+    {
+      "id": "e.actuator-robust",
+      "from": "actuator",
+      "to": "robust",
+      "type": "constraint",
+      "claim": "动作上限是鲁棒设计的边界：超出可达动作范围的扰动无法靠控制消化。",
+      "condition": "扰动幅度接近或超过执行器能力时。",
+      "cost": "放宽目标或增加执行能力都有成本。",
+      "claimIds": [
+        "c.rel.actuator-robust"
+      ],
+      "version": 1
+    },
+    {
+      "id": "e.actuator-controllability",
+      "from": "actuator",
+      "to": "controllability",
+      "type": "constraint",
+      "claim": "执行器饱和把形式可控性缩成受限可达集；模型内可控不等于工程内可达。",
+      "condition": "形式模型假设无约束输入，而真实执行器有上下限时。",
+      "cost": "忽略饱和会高估系统能力。",
+      "claimIds": [
+        "c.rel.actuator-controllability"
+      ],
+      "version": 1
+    },
+    {
+      "id": "e.controllability-variety",
+      "from": "controllability",
+      "to": "variety",
+      "type": "constraint",
+      "claim": "作用通道的数量不等于有效多样性：通道存在也不保证能区分并应对所有扰动。",
+      "condition": "把'工具很多'当作'调节能力足够'时。",
+      "cost": "有效多样性需要通道与扰动情境的对应，而不只是数量。",
+      "claimIds": [
+        "c.rel.controllability-variety"
+      ],
+      "version": 1
+    },
+    {
+      "id": "e.adaptation-variety",
+      "from": "adaptation",
+      "to": "variety",
+      "type": "application",
+      "claim": "适应通过改变规则来提高有效多样性；这是必要多样性理论在规则层面的工程应用。",
+      "condition": "把'换规则'当作提升调节能力的路径时。",
+      "cost": "换规则使旧证据失效，需要重建基线。",
+      "claimIds": [
+        "c.rel.adaptation-variety"
+      ],
+      "version": 1
+    },
+    {
+      "id": "e.model-robust",
+      "from": "model",
+      "to": "robust",
+      "type": "prerequisite",
+      "claim": "讨论鲁棒性之前先要有可用的模型与扰动分类，否则'鲁棒'无法定义。",
+      "condition": "评估系统对未建模动态的容忍度时。",
+      "cost": "模型越简化，鲁棒性评估越可能漏掉关键扰动。",
+      "claimIds": [
+        "c.rel.model-robust"
+      ],
+      "version": 1
+    },
+    {
+      "id": "e.robust-tradeoff",
+      "from": "robust",
+      "to": "tradeoff",
+      "type": "constraint",
+      "claim": "鲁棒性以性能或资源为代价，取舍必须显式写出。",
+      "condition": "用降增益/冗余/放宽要求换取稳定时。",
+      "cost": "代价被隐藏时，'更稳'会以别处故障的形式回来。",
+      "claimIds": [
+        "c.rel.robust-tradeoff"
+      ],
+      "version": 1
+    },
+    {
+      "id": "e.tradeoff-goal",
+      "from": "tradeoff",
+      "to": "goal",
+      "type": "prerequisite",
+      "claim": "取舍最终要回到'被维持的量'与承担代价的一方。",
+      "condition": "比较互不支配的方案时。",
+      "cost": "没有明确目标量时，取舍会退化为偏好或权力。",
+      "claimIds": [
+        "c.rel.tradeoff-goal"
+      ],
+      "version": 1
+    },
+    {
+      "id": "e.model-agentloop",
+      "from": "model",
+      "to": "agentloop",
+      "type": "application",
+      "claim": "模型与前馈被迁移成任务契约里的'预判与回退'；这是工程应用，不是理论等价。",
+      "condition": "让智能体提前处理可预见的失败时。",
+      "cost": "预判错误会主动制造偏差，必须配回退。",
+      "claimIds": [
+        "c.rel.model-agentloop"
+      ],
+      "version": 1
+    },
+    {
+      "id": "e.vsm-cybersyn",
+      "from": "vsm",
+      "to": "cybersyn",
+      "type": "historical",
+      "claim": "VSM 是 Cybersyn 项目背后的组织控制论；这是历史影响与历史联系，不是同一机制，项目实践也不能直接证明模型普遍有效。",
+      "condition": "讨论啤酒与智利项目的关系时。",
+      "cost": "把项目成败当理论验证会混淆技术、制度与政治条件。",
+      "claimIds": [
+        "c.rel.vsm-cybersyn"
+      ],
+      "version": 1
+    },
+    {
+      "id": "e.vsm-variety",
+      "from": "vsm",
+      "to": "variety",
+      "type": "historical",
+      "claim": "比尔的组织论述借用了调节与多样性思想；这是历史影响线索，不是同一机制，具体继承关系本包未逐条核对。",
+      "condition": "把 VSM 与 Ashby 的多样性理论放在一起讨论时。",
+      "cost": "未经核对的继承关系不能当作理论证明。",
+      "claimIds": [
+        "c.rel.vsm-variety"
+      ],
+      "version": 1
+    },
+    {
+      "id": "e.cybersyn-boundary",
+      "from": "cybersyn",
+      "to": "boundary",
+      "type": "application",
+      "claim": "Cybersyn 只覆盖接入电传网络的工厂，是'系统边界'在历史案例中的应用。",
+      "condition": "分析历史或组织信息系统的覆盖范围时。",
+      "cost": "边界外的人与数据对系统不可见，但真实后果仍会发生。",
+      "claimIds": [
+        "c.rel.cybersyn-boundary"
+      ],
+      "version": 1
+    },
+    {
+      "id": "e.cybersyn-indicator",
+      "from": "cybersyn",
+      "to": "indicator",
+      "type": "application",
+      "claim": "统计指标成为决策依据，是'指标/代理目标'在历史案例中的应用。",
+      "condition": "用统计汇总代替逐厂判断时。",
+      "cost": "指标的定义与汇总方式会决定哪些问题被看见。",
+      "claimIds": [
+        "c.rel.cybersyn-indicator"
+      ],
+      "version": 1
+    },
+    {
+      "id": "e.indicator-measurement",
+      "from": "indicator",
+      "to": "measurement",
+      "type": "prerequisite",
+      "claim": "指标是一种测量选择：先理解测量，才能理解代理指标为何会脱钩。",
+      "condition": "设计或审查一个指标时。",
+      "cost": "不同的测量方式会让同一指标含义不同。",
+      "claimIds": [
+        "c.rel.indicator-measurement"
+      ],
+      "version": 1
+    },
+    {
+      "id": "e.secondorder-responsibility",
+      "from": "secondorder",
+      "to": "responsibility",
+      "type": "historical",
+      "claim": "二阶控制论把观察者位置带出认识论讨论，引出'谁判定、谁负责'；这是历史影响。",
+      "condition": "讨论评估标准与责任归属时。",
+      "cost": "把二阶反思当作责任方案本身，会停在'写出位置'而没有制度。",
+      "claimIds": [
+        "c.rel.secondorder-responsibility"
+      ],
+      "version": 1
+    },
+    {
+      "id": "e.responsibility-agentloop",
+      "from": "responsibility",
+      "to": "agentloop",
+      "type": "application",
+      "claim": "'谁验收、谁有权停止'被迁移到智能体任务契约；这是工程应用。",
+      "condition": "设计人工检查点与停止条件时。",
+      "cost": "文字承诺不等于真实权限，检查点必须落在可执行的接口上。",
+      "claimIds": [
+        "c.rel.responsibility-agentloop"
+      ],
+      "version": 1
+    },
+    {
+      "id": "e.agentloop-feedback",
+      "from": "agentloop",
+      "to": "feedback",
+      "type": "application",
+      "claim": "智能体工作过程被描述为反馈回路；这是工程类比应用，不是新的理论。",
+      "condition": "分析智能体任务的测量、行动与修正环节时。",
+      "cost": "智能体的内部推理不可观测，回路图只能画出输入输出层。",
+      "claimIds": [
+        "c.rel.agentloop-feedback"
+      ],
+      "version": 1
+    },
+    {
+      "id": "e.agentloop-measurement",
+      "from": "agentloop",
+      "to": "measurement",
+      "type": "application",
+      "claim": "智能体的验收就是它的测量环节；验收设计决定它能稳定地优化什么。",
+      "condition": "设计与审查验收标准时。",
+      "cost": "只测容易测的量，智能体会稳定地优化那些量而不是目的。",
+      "claimIds": [
+        "c.rel.agentloop-measurement"
+      ],
+      "version": 1
+    },
+    {
+      "id": "e.agentloop-actuator",
+      "from": "agentloop",
+      "to": "actuator",
+      "type": "application",
+      "claim": "智能体的权限与工具就是它的动作上限；先看能不能做，再看做得对不对。",
+      "condition": "分析任务失败原因时。",
+      "cost": "放宽权限有安全代价，不能只因为要成功就无限提权。",
+      "claimIds": [
+        "c.rel.agentloop-actuator"
+      ],
+      "version": 1
+    },
+    {
+      "id": "e.agentloop-delay",
+      "from": "agentloop",
+      "to": "delay",
+      "type": "application",
+      "claim": "'改完到看见结果'的时间就是延迟，决定它一次能改多少。",
+      "condition": "执行与验证之间的等待明显时。",
+      "cost": "一次改太多会因延迟而过度修正。",
+      "claimIds": [
+        "c.rel.agentloop-delay"
+      ],
+      "version": 1
+    },
+    {
+      "id": "e.agentloop-variety",
+      "from": "agentloop",
+      "to": "variety",
+      "type": "application",
+      "claim": "行动范围是给智能体的多样性预算：太窄做不了，太宽失控。",
+      "condition": "为智能体划定允许动作范围时。",
+      "cost": "多样性预算难以先验确定，需要证据与修订。",
+      "claimIds": [
+        "c.rel.agentloop-variety"
+      ],
+      "version": 1
+    },
+    {
+      "id": "e.pi-agentloop",
+      "from": "pi",
+      "to": "agentloop",
+      "type": "analogy",
+      "claim": "'记住上次失败'像积分项；这是类比，不是同一机制——智能体的记忆与积分器在信号定义上并不相同。",
+      "condition": "给人看'积累旧误差会导致过度补偿'时。",
+      "cost": "把类比当成控制器设计依据，会错误估计参数。",
+      "claimIds": [
+        "c.rel.pi-agentloop"
+      ],
+      "version": 1
+    }
+  ],
+  "claims": [
+    {
+      "id": "c.boundary.1",
+      "subject": {
+        "kind": "node",
+        "id": "boundary"
+      },
+      "text": "系统的边界不是世界固有的分区，而是观察者为某个目标量选定的一组变量与关系。",
+      "kind": "interpretation",
+      "sourceIds": [
+        "s.ashby1956"
+      ],
+      "verified": "verified",
+      "verifiedAt": "2026-10-28T00:40:00.000Z"
+    },
+    {
+      "id": "c.boundary.2",
+      "subject": {
+        "kind": "node",
+        "id": "boundary"
+      },
+      "text": "扩大边界会增加解释与验证成本，并不会自动更正确；边界应依据'是否改变目标状态'来划。",
+      "kind": "interpretation",
+      "sourceIds": [
+        "s.author-practice"
+      ],
+      "verified": "unverified",
+      "verifiedAt": null
+    },
+    {
+      "id": "c.goal.1",
+      "subject": {
+        "kind": "node",
+        "id": "goal"
+      },
+      "text": "调节（regulation）是相对于一个被维持的量而言的；没有可判定的目标量，就无法评价回路是否在纠正。",
+      "kind": "interpretation",
+      "sourceIds": [
+        "s.ashby1956"
+      ],
+      "verified": "verified",
+      "verifiedAt": "2026-10-28T00:40:00.000Z"
+    },
+    {
+      "id": "c.goal.2",
+      "subject": {
+        "kind": "node",
+        "id": "goal"
+      },
+      "text": "目标由谁设定、由谁承担后果，是价值与制度问题，不由控制方程回答。",
+      "kind": "interpretation",
+      "sourceIds": [
+        "s.wiener1950"
+      ],
+      "verified": "verified",
+      "verifiedAt": "2026-10-28T00:40:00.000Z"
+    },
+    {
+      "id": "c.observer.1",
+      "subject": {
+        "kind": "node",
+        "id": "observer"
+      },
+      "text": "二阶控制论把观察者的位置与描述纳入系统研究；这是控制论在 1970 年代的认识论转向。",
+      "kind": "historical",
+      "sourceIds": [
+        "s.foerster1974",
+        "s.heims1991"
+      ],
+      "verified": "secondary",
+      "verifiedAt": "2026-10-28T00:40:00.000Z"
+    },
+    {
+      "id": "c.observer.2",
+      "subject": {
+        "kind": "node",
+        "id": "observer"
+      },
+      "text": "同一系统的不同观察者会给出不同的'通过'判据；一次验收必须写明谁在判定。",
+      "kind": "interpretation",
+      "sourceIds": [
+        "s.author-practice"
+      ],
+      "verified": "unverified",
+      "verifiedAt": null
+    },
+    {
+      "id": "c.wiener.1",
+      "subject": {
+        "kind": "node",
+        "id": "wiener"
+      },
+      "text": "维纳 1948 年的《控制论》把控制与通信放进同一个理论框架。",
+      "kind": "historical",
+      "sourceIds": [
+        "s.wiener1948"
+      ],
+      "verified": "secondary",
+      "verifiedAt": "2026-10-28T00:40:00.000Z"
+    },
+    {
+      "id": "c.wiener.2",
+      "subject": {
+        "kind": "node",
+        "id": "wiener"
+      },
+      "text": "维纳 1950 年的《人有人的用处》讨论自动化与人的位置，而不只是工程稳定性。",
+      "kind": "historical",
+      "sourceIds": [
+        "s.wiener1950"
+      ],
+      "verified": "verified",
+      "verifiedAt": "2026-10-28T00:40:00.000Z"
+    },
+    {
+      "id": "c.wiener.3",
+      "subject": {
+        "kind": "node",
+        "id": "wiener"
+      },
+      "text": "1943 年《行为、目的与目的论》把目的性行为等同于由负反馈控制的行为。",
+      "kind": "historical",
+      "sourceIds": [
+        "s.rwb1943"
+      ],
+      "verified": "verified",
+      "verifiedAt": "2026-10-28T00:40:00.000Z"
+    },
+    {
+      "id": "c.state.1",
+      "subject": {
+        "kind": "node",
+        "id": "state"
+      },
+      "text": "状态是决定系统未来行为的一组变量；输出是当下可读到的部分，相同输出可以对应不同内部状态。",
+      "kind": "interpretation",
+      "sourceIds": [
+        "s.astrom2008"
+      ],
+      "verified": "secondary",
+      "verifiedAt": "2026-10-28T00:40:00.000Z"
+    },
+    {
+      "id": "c.state.2",
+      "subject": {
+        "kind": "node",
+        "id": "state"
+      },
+      "text": "仅凭输入—输出记录不能唯一确定内部状态；要区分状态，需要设计能让差异显现的输入与观测。",
+      "kind": "interpretation",
+      "sourceIds": [
+        "s.kalman1960",
+        "s.astrom2008"
+      ],
+      "verified": "secondary",
+      "verifiedAt": "2026-10-28T00:40:00.000Z"
+    },
+    {
+      "id": "c.feedback.1",
+      "subject": {
+        "kind": "node",
+        "id": "feedback"
+      },
+      "text": "负反馈回路把输出的测量送回输入端，用目标与测量之差驱动修正。",
+      "kind": "interpretation",
+      "sourceIds": [
+        "s.ashby1956",
+        "s.rwb1943"
+      ],
+      "verified": "verified",
+      "verifiedAt": "2026-10-28T00:40:00.000Z"
+    },
+    {
+      "id": "c.feedback.2",
+      "subject": {
+        "kind": "node",
+        "id": "feedback"
+      },
+      "text": "负反馈不蕴含稳定：阻尼不足的反馈会在某些频率上表现为正反馈，产生笨拙或增幅的行为。",
+      "kind": "empirical",
+      "sourceIds": [
+        "s.rwb1943",
+        "s.maxwell1868"
+      ],
+      "verified": "verified",
+      "verifiedAt": "2026-10-28T00:40:00.000Z"
+    },
+    {
+      "id": "c.feedback.3",
+      "subject": {
+        "kind": "node",
+        "id": "feedback"
+      },
+      "text": "反馈只能纠正它测到的量；测量选择决定了回路会稳定地维持什么、漏掉什么。",
+      "kind": "interpretation",
+      "sourceIds": [
+        "s.author-practice"
+      ],
+      "verified": "unverified",
+      "verifiedAt": null
+    },
+    {
+      "id": "c.positive.1",
+      "subject": {
+        "kind": "node",
+        "id": "positive"
+      },
+      "text": "回路的符号不是固定的：同一反馈在阻尼不足时可能在部分频率上变成正反馈。",
+      "kind": "empirical",
+      "sourceIds": [
+        "s.rwb1943"
+      ],
+      "verified": "verified",
+      "verifiedAt": "2026-10-28T00:40:00.000Z"
+    },
+    {
+      "id": "c.positive.2",
+      "subject": {
+        "kind": "node",
+        "id": "positive"
+      },
+      "text": "正反馈让偏离自我增强，终点通常受饱和或边界限制，而不是回到平衡。",
+      "kind": "interpretation",
+      "sourceIds": [
+        "s.author-practice"
+      ],
+      "verified": "unverified",
+      "verifiedAt": null
+    },
+    {
+      "id": "c.variety.1",
+      "subject": {
+        "kind": "node",
+        "id": "variety"
+      },
+      "text": "必要多样性定律（Ashby 1956）：只有多样性能够消灭多样性；若调节器的有效反应多样性小于扰动的多样性，则不存在能抵消全部扰动的调节器。",
+      "kind": "formal",
+      "sourceIds": [
+        "s.ashby1956"
+      ],
+      "verified": "verified",
+      "verifiedAt": "2026-10-28T00:40:00.000Z"
+    },
+    {
+      "id": "c.variety.2",
+      "subject": {
+        "kind": "node",
+        "id": "variety"
+      },
+      "text": "增加调节器多样性有成本；工程上的常见出路是分散、放大或改变结构，而不是无限加大单一控制器。",
+      "kind": "interpretation",
+      "sourceIds": [
+        "s.ashby1956"
+      ],
+      "verified": "verified",
+      "verifiedAt": "2026-10-28T00:40:00.000Z"
+    },
+    {
+      "id": "c.macy.1",
+      "subject": {
+        "kind": "node",
+        "id": "macy"
+      },
+      "text": "梅西会议系列（1946–1953）是控制论形成期的跨学科会议；会议跨度不等于各卷出版年。",
+      "kind": "historical",
+      "sourceIds": [
+        "s.heims1991",
+        "s.pias2016"
+      ],
+      "verified": "secondary",
+      "verifiedAt": "2026-10-28T00:40:00.000Z"
+    },
+    {
+      "id": "c.macy.2",
+      "subject": {
+        "kind": "node",
+        "id": "macy"
+      },
+      "text": "会议参与者并未形成统一学说；'反馈''信息''目的'在不同学科之间靠类比翻译，保留了歧义。",
+      "kind": "historical",
+      "sourceIds": [
+        "s.heims1991"
+      ],
+      "verified": "secondary",
+      "verifiedAt": "2026-10-28T00:40:00.000Z"
+    },
+    {
+      "id": "c.delay.1",
+      "subject": {
+        "kind": "node",
+        "id": "delay"
+      },
+      "text": "延迟使纠正作用落在已经过去的状态上；延迟越大，可用的纠偏增益越小，过冲与振荡风险越高。",
+      "kind": "interpretation",
+      "sourceIds": [
+        "s.astrom2008",
+        "s.author-practice"
+      ],
+      "verified": "secondary",
+      "verifiedAt": "2026-10-28T00:40:00.000Z"
+    },
+    {
+      "id": "c.delay.2",
+      "subject": {
+        "kind": "node",
+        "id": "delay"
+      },
+      "text": "维纳与比格罗在二战期间的防空预测器研究，把延迟与人机回路问题推到控制论前台（会议与人物史见 Heims 1991）。",
+      "kind": "historical",
+      "sourceIds": [
+        "s.heims1991",
+        "s.wiener1948"
+      ],
+      "verified": "secondary",
+      "verifiedAt": "2026-10-28T00:40:00.000Z"
+    },
+    {
+      "id": "c.stability.1",
+      "subject": {
+        "kind": "node",
+        "id": "stability"
+      },
+      "text": "麦克斯韦 1868 年把调速器的稳定性化为方程根的条件：扰动应持续衰减；持续增长或增幅振荡属于不稳定。",
+      "kind": "historical",
+      "sourceIds": [
+        "s.maxwell1868"
+      ],
+      "verified": "secondary",
+      "verifiedAt": "2026-10-28T00:40:00.000Z"
+    },
+    {
+      "id": "c.stability.2",
+      "subject": {
+        "kind": "node",
+        "id": "stability"
+      },
+      "text": "在线性时不变、单回路且开环无右半平面极点等前提下，闭环稳定性由开环频率响应的 Nyquist 判据判定；负反馈本身不蕴含稳定。",
+      "kind": "formal",
+      "sourceIds": [
+        "s.nyquist1932",
+        "s.astrom2008"
+      ],
+      "verified": "verified",
+      "verifiedAt": "2026-10-28T00:40:00.000Z"
+    },
+    {
+      "id": "c.stability.3",
+      "subject": {
+        "kind": "node",
+        "id": "stability"
+      },
+      "text": "稳定不等于正确：稳定地指向错误目标的回路比振荡更难发现。",
+      "kind": "interpretation",
+      "sourceIds": [
+        "s.author-practice"
+      ],
+      "verified": "unverified",
+      "verifiedAt": null
+    },
+    {
+      "id": "c.sampling.1",
+      "subject": {
+        "kind": "node",
+        "id": "sampling"
+      },
+      "text": "Nyquist–Shannon 采样定理：最高频率为 B 的带限信号，以 fs>2B 均匀采样可由样本完全重建；低于该速率产生混叠。",
+      "kind": "formal",
+      "sourceIds": [
+        "s.shannon1948",
+        "s.nyquist1928"
+      ],
+      "verified": "verified",
+      "verifiedAt": "2026-10-28T00:40:00.000Z"
+    },
+    {
+      "id": "c.sampling.2",
+      "subject": {
+        "kind": "node",
+        "id": "sampling"
+      },
+      "text": "采样率提高不能恢复已经丢失的信息；观测粒度会系统性地漏掉比它更快的现象。",
+      "kind": "interpretation",
+      "sourceIds": [
+        "s.shannon1948"
+      ],
+      "verified": "verified",
+      "verifiedAt": "2026-10-28T00:40:00.000Z"
+    },
+    {
+      "id": "c.measurement.1",
+      "subject": {
+        "kind": "node",
+        "id": "measurement"
+      },
+      "text": "测量把状态映射成可比较的量；黑箱方法只依靠输入—输出的对应建立可操作的行为模型。",
+      "kind": "interpretation",
+      "sourceIds": [
+        "s.ashby1956"
+      ],
+      "verified": "verified",
+      "verifiedAt": "2026-10-28T00:40:00.000Z"
+    },
+    {
+      "id": "c.measurement.2",
+      "subject": {
+        "kind": "node",
+        "id": "measurement"
+      },
+      "text": "有限测试通过只支持'在测过的输入上正确'，不自动支持普遍结论；把全绿当正确是从有限观测跳到普遍主张。",
+      "kind": "interpretation",
+      "sourceIds": [
+        "s.author-practice"
+      ],
+      "verified": "unverified",
+      "verifiedAt": null
+    },
+    {
+      "id": "c.measurement.3",
+      "subject": {
+        "kind": "node",
+        "id": "measurement"
+      },
+      "text": "在线性时不变模型中，可观测性由可观性矩阵的秩判定；并非所有内部状态都能由输出推断。",
+      "kind": "formal",
+      "sourceIds": [
+        "s.kalman1960",
+        "s.astrom2008"
+      ],
+      "verified": "secondary",
+      "verifiedAt": "2026-10-28T00:40:00.000Z"
+    },
+    {
+      "id": "c.blackbox.1",
+      "subject": {
+        "kind": "node",
+        "id": "blackbox"
+      },
+      "text": "黑箱方法用输入—输出对应建立行为模型：得到可操作性，失去对内部机制的解释。",
+      "kind": "interpretation",
+      "sourceIds": [
+        "s.ashby1956"
+      ],
+      "verified": "verified",
+      "verifiedAt": "2026-10-28T00:40:00.000Z"
+    },
+    {
+      "id": "c.blackbox.2",
+      "subject": {
+        "kind": "node",
+        "id": "blackbox"
+      },
+      "text": "黑箱模型只对覆盖过的输入范围给出保证；输入空间之外不提供任何结论。",
+      "kind": "interpretation",
+      "sourceIds": [
+        "s.author-practice"
+      ],
+      "verified": "unverified",
+      "verifiedAt": null
+    },
+    {
+      "id": "c.homeostat.1",
+      "subject": {
+        "kind": "node",
+        "id": "homeostat"
+      },
+      "text": "Ashby 的 Homeostat 通过改变内部耦合来寻找新的稳定状态，不依赖记忆或目标表征。",
+      "kind": "interpretation",
+      "sourceIds": [
+        "s.ashby1952"
+      ],
+      "verified": "verified",
+      "verifiedAt": "2026-10-28T00:40:00.000Z"
+    },
+    {
+      "id": "c.homeostat.2",
+      "subject": {
+        "kind": "node",
+        "id": "homeostat"
+      },
+      "text": "超稳定性（ultrastability）指系统在参数层搜索，使基本变量回到可生存的界限内。",
+      "kind": "interpretation",
+      "sourceIds": [
+        "s.ashby1952"
+      ],
+      "verified": "verified",
+      "verifiedAt": "2026-10-28T00:40:00.000Z"
+    },
+    {
+      "id": "c.shannon.1",
+      "subject": {
+        "kind": "node",
+        "id": "shannon"
+      },
+      "text": "香农 1948 年把通信的基本问题定义为在另一地点复现选定的消息，并明确把语义方面排除在工程问题之外。",
+      "kind": "interpretation",
+      "sourceIds": [
+        "s.shannon1948"
+      ],
+      "verified": "verified",
+      "verifiedAt": "2026-10-28T00:40:00.000Z"
+    },
+    {
+      "id": "c.shannon.2",
+      "subject": {
+        "kind": "node",
+        "id": "shannon"
+      },
+      "text": "信息量与信道容量度量的是消息集合的统计结构与可靠传输上限，不度量意义、真实性或理解程度。",
+      "kind": "interpretation",
+      "sourceIds": [
+        "s.shannon1948"
+      ],
+      "verified": "verified",
+      "verifiedAt": "2026-10-28T00:40:00.000Z"
+    },
+    {
+      "id": "c.shannon.3",
+      "subject": {
+        "kind": "node",
+        "id": "shannon"
+      },
+      "text": "在有噪声信道上，若传输速率低于信道容量，则存在编码使错误概率任意小（离散无记忆信道等前提）。",
+      "kind": "formal",
+      "sourceIds": [
+        "s.shannon1948"
+      ],
+      "verified": "verified",
+      "verifiedAt": "2026-10-28T00:40:00.000Z"
+    },
+    {
+      "id": "c.actuator.1",
+      "subject": {
+        "kind": "node",
+        "id": "actuator"
+      },
+      "text": "执行器饱和后，误差再大也只能得到同一个最大动作；在形式模型里这会缩减可达状态集合。",
+      "kind": "interpretation",
+      "sourceIds": [
+        "s.astrom2008",
+        "s.kalman1960"
+      ],
+      "verified": "secondary",
+      "verifiedAt": "2026-10-28T00:40:00.000Z"
+    },
+    {
+      "id": "c.actuator.2",
+      "subject": {
+        "kind": "node",
+        "id": "actuator"
+      },
+      "text": "提高动作上限通常有成本（资源、副作用、权限），不能任意提高。",
+      "kind": "interpretation",
+      "sourceIds": [
+        "s.author-practice"
+      ],
+      "verified": "unverified",
+      "verifiedAt": null
+    },
+    {
+      "id": "c.adaptation.1",
+      "subject": {
+        "kind": "node",
+        "id": "adaptation"
+      },
+      "text": "适应是在规则或参数层面改变自身以维持基本变量，而不只是加大动作。",
+      "kind": "interpretation",
+      "sourceIds": [
+        "s.ashby1952"
+      ],
+      "verified": "verified",
+      "verifiedAt": "2026-10-28T00:40:00.000Z"
+    },
+    {
+      "id": "c.adaptation.2",
+      "subject": {
+        "kind": "node",
+        "id": "adaptation"
+      },
+      "text": "适应不等于进步：适应一个环境可能降低在另一个环境中的表现，需要跨条件证据。",
+      "kind": "interpretation",
+      "sourceIds": [
+        "s.ashby1952",
+        "s.author-practice"
+      ],
+      "verified": "secondary",
+      "verifiedAt": "2026-10-28T00:40:00.000Z"
+    },
+    {
+      "id": "c.pi.1",
+      "subject": {
+        "kind": "node",
+        "id": "pi"
+      },
+      "text": "比例项按当前误差出力，积分项累积历史误差；积分消除稳态误差但引入滞后与积分饱和风险。",
+      "kind": "interpretation",
+      "sourceIds": [
+        "s.astrom2008",
+        "s.minorsky1922"
+      ],
+      "verified": "secondary",
+      "verifiedAt": "2026-10-28T00:40:00.000Z"
+    },
+    {
+      "id": "c.pi.2",
+      "subject": {
+        "kind": "node",
+        "id": "pi"
+      },
+      "text": "米诺尔斯基 1922 年的自动操舵论文给出比例/积分作用的早期工程表述。",
+      "kind": "historical",
+      "sourceIds": [
+        "s.minorsky1922"
+      ],
+      "verified": "verified",
+      "verifiedAt": "2026-10-28T00:40:00.000Z"
+    },
+    {
+      "id": "c.controllability.1",
+      "subject": {
+        "kind": "node",
+        "id": "controllability"
+      },
+      "text": "对线性时不变系统 ẋ=Ax+Bu，状态完全可控当且仅当可控性矩阵 [B, AB, …, A^(n-1)B] 满秩（给定状态空间模型与无约束输入）。",
+      "kind": "formal",
+      "sourceIds": [
+        "s.kalman1960",
+        "s.astrom2008"
+      ],
+      "verified": "secondary",
+      "verifiedAt": "2026-10-28T00:40:00.000Z"
+    },
+    {
+      "id": "c.controllability.2",
+      "subject": {
+        "kind": "node",
+        "id": "controllability"
+      },
+      "text": "可控性回答'能否到达'，可观测性回答'能否知道'；两者由不同判据刻画，不能互相推出。",
+      "kind": "interpretation",
+      "sourceIds": [
+        "s.kalman1960",
+        "s.astrom2008"
+      ],
+      "verified": "secondary",
+      "verifiedAt": "2026-10-28T00:40:00.000Z"
+    },
+    {
+      "id": "c.controllability.3",
+      "subject": {
+        "kind": "node",
+        "id": "controllability"
+      },
+      "text": "工具可用或权限存在不保证目标可达；需要一条在约束内可达目标的作用通道与足够动作幅度。",
+      "kind": "interpretation",
+      "sourceIds": [
+        "s.author-practice"
+      ],
+      "verified": "unverified",
+      "verifiedAt": null
+    },
+    {
+      "id": "c.model.1",
+      "subject": {
+        "kind": "node",
+        "id": "model"
+      },
+      "text": "前馈按模型预测提前动作；预测错误没有自我纠正机制，误差会一路带下去。",
+      "kind": "interpretation",
+      "sourceIds": [
+        "s.astrom2008",
+        "s.conantashby1970"
+      ],
+      "verified": "secondary",
+      "verifiedAt": "2026-10-28T00:40:00.000Z"
+    },
+    {
+      "id": "c.model.2",
+      "subject": {
+        "kind": "node",
+        "id": "model"
+      },
+      "text": "Conant–Ashby 形式结果：在有限系统与'良好调节'（调节器结果集合包含于系统结果集合）的定义下，好的调节器必须是系统的模型。",
+      "kind": "formal",
+      "sourceIds": [
+        "s.conantashby1970"
+      ],
+      "verified": "secondary",
+      "verifiedAt": "2026-10-28T00:40:00.000Z"
+    },
+    {
+      "id": "c.robust.1",
+      "subject": {
+        "kind": "node",
+        "id": "robust"
+      },
+      "text": "鲁棒性通常以降低增益、增加冗余或放宽要求换取；三者都在别处付出代价。",
+      "kind": "interpretation",
+      "sourceIds": [
+        "s.astrom2008",
+        "s.tsien1954"
+      ],
+      "verified": "secondary",
+      "verifiedAt": "2026-10-28T00:40:00.000Z"
+    },
+    {
+      "id": "c.robust.2",
+      "subject": {
+        "kind": "node",
+        "id": "robust"
+      },
+      "text": "鲁棒设计只覆盖设计时想到的扰动类型；未建模扰动不在保证范围内。",
+      "kind": "interpretation",
+      "sourceIds": [
+        "s.astrom2008",
+        "s.author-practice"
+      ],
+      "verified": "secondary",
+      "verifiedAt": "2026-10-28T00:40:00.000Z"
+    },
+    {
+      "id": "c.tradeoff.1",
+      "subject": {
+        "kind": "node",
+        "id": "tradeoff"
+      },
+      "text": "控制问题是在误差与纠正代价之间选点；零误差不是默认目标。",
+      "kind": "interpretation",
+      "sourceIds": [
+        "s.astrom2008",
+        "s.wiener1948"
+      ],
+      "verified": "secondary",
+      "verifiedAt": "2026-10-28T00:40:00.000Z"
+    },
+    {
+      "id": "c.tradeoff.2",
+      "subject": {
+        "kind": "node",
+        "id": "tradeoff"
+      },
+      "text": "取舍的权重是价值选择，不是天然事实；必须回到目标量与承担代价的一方。",
+      "kind": "interpretation",
+      "sourceIds": [
+        "s.wiener1950",
+        "s.author-practice"
+      ],
+      "verified": "secondary",
+      "verifiedAt": "2026-10-28T00:40:00.000Z"
+    },
+    {
+      "id": "c.vsm.1",
+      "subject": {
+        "kind": "node",
+        "id": "vsm"
+      },
+      "text": "比尔 1972 年的《企业的大脑》提出可生存系统模型（VSM），以五个功能刻画能存活的组织。",
+      "kind": "historical",
+      "sourceIds": [
+        "s.beer1972"
+      ],
+      "verified": "secondary",
+      "verifiedAt": "2026-10-28T00:40:00.000Z"
+    },
+    {
+      "id": "c.vsm.2",
+      "subject": {
+        "kind": "node",
+        "id": "vsm"
+      },
+      "text": "VSM 是诊断框架而不是组织结构图；把它套进真实组织需要额外的权力与历史分析。",
+      "kind": "interpretation",
+      "sourceIds": [
+        "s.beer1972",
+        "s.author-practice"
+      ],
+      "verified": "secondary",
+      "verifiedAt": "2026-10-28T00:40:00.000Z"
+    },
+    {
+      "id": "c.cybersyn.1",
+      "subject": {
+        "kind": "node",
+        "id": "cybersyn"
+      },
+      "text": "Project Cybersyn（1971–1973）用 telex 网络与统计预测支持智利的经济管理。",
+      "kind": "historical",
+      "sourceIds": [
+        "s.medina2011"
+      ],
+      "verified": "verified",
+      "verifiedAt": "2026-10-28T00:40:00.000Z"
+    },
+    {
+      "id": "c.cybersyn.2",
+      "subject": {
+        "kind": "node",
+        "id": "cybersyn"
+      },
+      "text": "系统只覆盖接入网络的工厂；未接入的部分对系统不可见；1973 年政变后项目终止。",
+      "kind": "historical",
+      "sourceIds": [
+        "s.medina2011"
+      ],
+      "verified": "verified",
+      "verifiedAt": "2026-10-28T00:40:00.000Z"
+    },
+    {
+      "id": "c.indicator.1",
+      "subject": {
+        "kind": "node",
+        "id": "indicator"
+      },
+      "text": "古德哈特 1975 年讨论货币目标时指出：统计规律一旦被用于控制就会失效；'古德哈特定律'是后人的概括，不是原文定理。",
+      "kind": "historical",
+      "sourceIds": [
+        "s.goodhart1975"
+      ],
+      "verified": "secondary",
+      "verifiedAt": "2026-10-28T00:40:00.000Z"
+    },
+    {
+      "id": "c.indicator.2",
+      "subject": {
+        "kind": "node",
+        "id": "indicator"
+      },
+      "text": "单一代理指标不能作为目的达成的证据；需要独立的第二个指标或行为证据来交叉检查。",
+      "kind": "interpretation",
+      "sourceIds": [
+        "s.goodhart1975",
+        "s.author-practice"
+      ],
+      "verified": "secondary",
+      "verifiedAt": "2026-10-28T00:40:00.000Z"
+    },
+    {
+      "id": "c.secondorder.1",
+      "subject": {
+        "kind": "node",
+        "id": "secondorder"
+      },
+      "text": "二阶控制论把观察者与描述纳入控制论的研究对象；这是 1970 年代前后的转向，具体年份与文献需按一手材料核验。",
+      "kind": "historical",
+      "sourceIds": [
+        "s.foerster1974",
+        "s.heims1991"
+      ],
+      "verified": "secondary",
+      "verifiedAt": "2026-10-28T00:40:00.000Z"
+    },
+    {
+      "id": "c.secondorder.2",
+      "subject": {
+        "kind": "node",
+        "id": "secondorder"
+      },
+      "text": "二阶控制论并不使所有陈述等价；它要求写明观察位置与判定标准。",
+      "kind": "interpretation",
+      "sourceIds": [
+        "s.foerster1974",
+        "s.heims1991",
+        "s.author-practice"
+      ],
+      "verified": "secondary",
+      "verifiedAt": "2026-10-28T00:40:00.000Z"
+    },
+    {
+      "id": "c.responsibility.1",
+      "subject": {
+        "kind": "node",
+        "id": "responsibility"
+      },
+      "text": "维纳 1950 年把自动化与人的社会后果放进控制论讨论。",
+      "kind": "historical",
+      "sourceIds": [
+        "s.wiener1950"
+      ],
+      "verified": "verified",
+      "verifiedAt": "2026-10-28T00:40:00.000Z"
+    },
+    {
+      "id": "c.responsibility.2",
+      "subject": {
+        "kind": "node",
+        "id": "responsibility"
+      },
+      "text": "把人的检查点放在回路末端（事后审批）只能追责，不能预防；检查点必须在回路中可实际拦截的位置。",
+      "kind": "interpretation",
+      "sourceIds": [
+        "s.author-practice"
+      ],
+      "verified": "unverified",
+      "verifiedAt": null
+    },
+    {
+      "id": "c.agentloop.1",
+      "subject": {
+        "kind": "node",
+        "id": "agentloop"
+      },
+      "text": "编程智能体的工作过程可以画成读—改—跑—看结果的反馈回路；这是作者判断的工程迁移，不是历史事实。",
+      "kind": "interpretation",
+      "sourceIds": [
+        "s.author-practice"
+      ],
+      "verified": "unverified",
+      "verifiedAt": null
+    },
+    {
+      "id": "c.agentloop.2",
+      "subject": {
+        "kind": "node",
+        "id": "agentloop"
+      },
+      "text": "智能体的测量几乎总是'测试通过'，因此它的稳定性建立在验收设计之上；验收之外的行为没有保证。",
+      "kind": "interpretation",
+      "sourceIds": [
+        "s.author-practice"
+      ],
+      "verified": "unverified",
+      "verifiedAt": null
+    },
+    {
+      "id": "c.rel.goal-feedback",
+      "subject": {
+        "kind": "relation",
+        "id": "e.goal-feedback"
+      },
+      "text": "反馈纠偏必须相对于一个目标量定义；没有目标量时，'纠正'没有方向。",
+      "kind": "interpretation",
+      "sourceIds": [
+        "s.ashby1956"
+      ],
+      "verified": "verified",
+      "verifiedAt": "2026-10-28T00:40:00.000Z"
+    },
+    {
+      "id": "c.rel.boundary-goal",
+      "subject": {
+        "kind": "relation",
+        "id": "e.boundary-goal"
+      },
+      "text": "边界划法决定哪些因素被算作可能改变目标量的扰动；边界是目标量判断的一部分。",
+      "kind": "interpretation",
+      "sourceIds": [
+        "s.ashby1956"
+      ],
+      "verified": "verified",
+      "verifiedAt": "2026-10-28T00:40:00.000Z"
+    },
+    {
+      "id": "c.rel.observer-boundary",
+      "subject": {
+        "kind": "relation",
+        "id": "e.observer-boundary"
+      },
+      "text": "边界由观察者切分：同一次系统描述里，观察位置决定哪些因素进入或排出边界。",
+      "kind": "interpretation",
+      "sourceIds": [
+        "s.foerster1974",
+        "s.heims1991"
+      ],
+      "verified": "secondary",
+      "verifiedAt": "2026-10-28T00:40:00.000Z"
+    },
+    {
+      "id": "c.rel.observer-secondorder",
+      "subject": {
+        "kind": "relation",
+        "id": "e.observer-secondorder"
+      },
+      "text": "二阶控制论把观察者位置从背景推到前台，这是控制论内部的历史发展，不是 observer 概念的简单重复。",
+      "kind": "historical",
+      "sourceIds": [
+        "s.foerster1974",
+        "s.heims1991"
+      ],
+      "verified": "secondary",
+      "verifiedAt": "2026-10-28T00:40:00.000Z"
+    },
+    {
+      "id": "c.rel.state-measurement",
+      "subject": {
+        "kind": "relation",
+        "id": "e.state-measurement"
+      },
+      "text": "形式模型中的测量与可观测性以状态描述为前提；没有状态，就无从讨论'哪个状态可被推断'。",
+      "kind": "interpretation",
+      "sourceIds": [
+        "s.kalman1960",
+        "s.astrom2008"
+      ],
+      "verified": "secondary",
+      "verifiedAt": "2026-10-28T00:40:00.000Z"
+    },
+    {
+      "id": "c.rel.state-controllability",
+      "subject": {
+        "kind": "relation",
+        "id": "e.state-controllability"
+      },
+      "text": "可控性的定义依赖状态空间模型：'能到达某个状态'这句话只在给定 A、B 与状态集合后才有意义。",
+      "kind": "interpretation",
+      "sourceIds": [
+        "s.kalman1960",
+        "s.astrom2008"
+      ],
+      "verified": "secondary",
+      "verifiedAt": "2026-10-28T00:40:00.000Z"
+    },
+    {
+      "id": "c.rel.state-stability",
+      "subject": {
+        "kind": "relation",
+        "id": "e.state-stability"
+      },
+      "text": "讨论收敛、振荡与发散，需要先有状态如何随时间变化的动态描述。",
+      "kind": "interpretation",
+      "sourceIds": [
+        "s.astrom2008"
+      ],
+      "verified": "secondary",
+      "verifiedAt": "2026-10-28T00:40:00.000Z"
+    },
+    {
+      "id": "c.rel.boundary-agentloop",
+      "subject": {
+        "kind": "relation",
+        "id": "e.boundary-agentloop"
+      },
+      "text": "把系统边界的判断迁移成任务契约里的'非目标'一栏，是边界概念在工程实践中的应用。",
+      "kind": "interpretation",
+      "sourceIds": [
+        "s.author-practice"
+      ],
+      "verified": "unverified",
+      "verifiedAt": null
+    },
+    {
+      "id": "c.rel.goal-agentloop",
+      "subject": {
+        "kind": "relation",
+        "id": "e.goal-agentloop"
+      },
+      "text": "把可判定的目标量迁移成任务契约的'期望行为'，是目标概念在工程实践中的应用。",
+      "kind": "interpretation",
+      "sourceIds": [
+        "s.author-practice"
+      ],
+      "verified": "unverified",
+      "verifiedAt": null
+    },
+    {
+      "id": "c.rel.wiener-feedback",
+      "subject": {
+        "kind": "relation",
+        "id": "e.wiener-feedback"
+      },
+      "text": "1943 年论文把目的性行为解释为由负反馈控制的行为，这是反馈概念在历史上的一个关键影响节点，不是两者的等价。",
+      "kind": "historical",
+      "sourceIds": [
+        "s.rwb1943",
+        "s.wiener1948"
+      ],
+      "verified": "verified",
+      "verifiedAt": "2026-10-28T00:40:00.000Z"
+    },
+    {
+      "id": "c.rel.wiener-responsibility",
+      "subject": {
+        "kind": "relation",
+        "id": "e.wiener-responsibility"
+      },
+      "text": "维纳 1950 年的社会论述把自动化后果带进控制论议题，这是责任问题的历史来源之一。",
+      "kind": "historical",
+      "sourceIds": [
+        "s.wiener1950"
+      ],
+      "verified": "verified",
+      "verifiedAt": "2026-10-28T00:40:00.000Z"
+    },
+    {
+      "id": "c.rel.wiener-macy",
+      "subject": {
+        "kind": "relation",
+        "id": "e.wiener-macy"
+      },
+      "text": "维纳与控制论形成期的跨学科网络有人员与议题交集；这是历史语境，不能推出会议等于他的学说。",
+      "kind": "historical",
+      "sourceIds": [
+        "s.heims1991"
+      ],
+      "verified": "secondary",
+      "verifiedAt": "2026-10-28T00:40:00.000Z"
+    },
+    {
+      "id": "c.rel.wiener-shannon",
+      "subject": {
+        "kind": "relation",
+        "id": "e.wiener-shannon"
+      },
+      "text": "1948 年两部著作在通信与信息议题上相关，但问题定义不同；这是历史语境，不是同一机制。",
+      "kind": "historical",
+      "sourceIds": [
+        "s.wiener1948",
+        "s.shannon1948"
+      ],
+      "verified": "secondary",
+      "verifiedAt": "2026-10-28T00:40:00.000Z"
+    },
+    {
+      "id": "c.rel.wiener-delay",
+      "subject": {
+        "kind": "relation",
+        "id": "e.wiener-delay"
+      },
+      "text": "防空预测器研究把延迟与人机回路问题推到控制论前台，这是延迟问题的历史影响之一。",
+      "kind": "historical",
+      "sourceIds": [
+        "s.heims1991",
+        "s.wiener1948"
+      ],
+      "verified": "secondary",
+      "verifiedAt": "2026-10-28T00:40:00.000Z"
+    },
+    {
+      "id": "c.rel.feedback-stability",
+      "subject": {
+        "kind": "relation",
+        "id": "e.feedback-stability"
+      },
+      "text": "对满足线性时不变、单回路、开环无右半平面极点等前提的回路，闭环稳定性由开环频率响应的 Nyquist 判据判定；负反馈本身不蕴含稳定。",
+      "kind": "formal",
+      "sourceIds": [
+        "s.nyquist1932",
+        "s.astrom2008"
+      ],
+      "verified": "verified",
+      "verifiedAt": "2026-10-28T00:40:00.000Z"
+    },
+    {
+      "id": "c.rel.feedback-measurement",
+      "subject": {
+        "kind": "relation",
+        "id": "e.feedback-measurement"
+      },
+      "text": "反馈只能纠正它测到的量；测量选择决定回路能稳定地维持什么。",
+      "kind": "interpretation",
+      "sourceIds": [
+        "s.ashby1956"
+      ],
+      "verified": "verified",
+      "verifiedAt": "2026-10-28T00:40:00.000Z"
+    },
+    {
+      "id": "c.rel.feedback-model",
+      "subject": {
+        "kind": "relation",
+        "id": "e.feedback-model"
+      },
+      "text": "Conant–Ashby 定理：在有限系统与'良好调节'定义下，好的调节器必须是系统的模型（存在同态关系）。",
+      "kind": "formal",
+      "sourceIds": [
+        "s.conantashby1970"
+      ],
+      "verified": "secondary",
+      "verifiedAt": "2026-10-28T00:40:00.000Z"
+    },
+    {
+      "id": "c.rel.feedback-positive",
+      "subject": {
+        "kind": "relation",
+        "id": "e.feedback-positive"
+      },
+      "text": "负反馈与正反馈是同一回路结构在符号上的两种情形；两者不是独立机制，符号还会随频率与阻尼反转。",
+      "kind": "interpretation",
+      "sourceIds": [
+        "s.rwb1943",
+        "s.ashby1956"
+      ],
+      "verified": "verified",
+      "verifiedAt": "2026-10-28T00:40:00.000Z"
+    },
+    {
+      "id": "c.rel.variety-feedback",
+      "subject": {
+        "kind": "relation",
+        "id": "e.variety-feedback"
+      },
+      "text": "必要多样性定律对反馈回路适用：调节器能区分并应对的扰动多样性，不超过它自身反应的有效多样性。",
+      "kind": "formal",
+      "sourceIds": [
+        "s.ashby1956"
+      ],
+      "verified": "verified",
+      "verifiedAt": "2026-10-28T00:40:00.000Z"
+    },
+    {
+      "id": "c.rel.positive-indicator",
+      "subject": {
+        "kind": "relation",
+        "id": "e.positive-indicator"
+      },
+      "text": "指标优化可以形成正反馈式的放大环；这是类比，不是同一机制。",
+      "kind": "interpretation",
+      "sourceIds": [
+        "s.goodhart1975",
+        "s.author-practice"
+      ],
+      "verified": "secondary",
+      "verifiedAt": "2026-10-28T00:40:00.000Z"
+    },
+    {
+      "id": "c.rel.macy-feedback",
+      "subject": {
+        "kind": "relation",
+        "id": "e.macy-feedback"
+      },
+      "text": "梅西会议把反馈与循环因果作为跨学科议题讨论；这是历史语境，各学科对反馈的定义并不相同。",
+      "kind": "historical",
+      "sourceIds": [
+        "s.heims1991"
+      ],
+      "verified": "secondary",
+      "verifiedAt": "2026-10-28T00:40:00.000Z"
+    },
+    {
+      "id": "c.rel.macy-observer",
+      "subject": {
+        "kind": "relation",
+        "id": "e.macy-observer"
+      },
+      "text": "二阶控制论与梅西会议网络有人员与议题关联；这是历史影响线索，不能推出会议直接产生二阶控制论。",
+      "kind": "historical",
+      "sourceIds": [
+        "s.heims1991",
+        "s.foerster1974"
+      ],
+      "verified": "secondary",
+      "verifiedAt": "2026-10-28T00:40:00.000Z"
+    },
+    {
+      "id": "c.rel.delay-stability",
+      "subject": {
+        "kind": "relation",
+        "id": "e.delay-stability"
+      },
+      "text": "延迟把纠偏推迟到偏差已经变化之后，可用增益因此受压；同一增益可随延迟从收敛变为振荡。",
+      "kind": "empirical",
+      "sourceIds": [
+        "s.astrom2008",
+        "s.author-practice"
+      ],
+      "verified": "secondary",
+      "verifiedAt": "2026-10-28T00:40:00.000Z"
+    },
+    {
+      "id": "c.rel.delay-pi",
+      "subject": {
+        "kind": "relation",
+        "id": "e.delay-pi"
+      },
+      "text": "积分项在延迟下增加相位滞后，降低可用增益，并放大积分饱和造成的过冲。",
+      "kind": "interpretation",
+      "sourceIds": [
+        "s.astrom2008",
+        "s.minorsky1922"
+      ],
+      "verified": "secondary",
+      "verifiedAt": "2026-10-28T00:40:00.000Z"
+    },
+    {
+      "id": "c.rel.sampling-measurement",
+      "subject": {
+        "kind": "relation",
+        "id": "e.sampling-measurement"
+      },
+      "text": "Nyquist–Shannon 采样定理：带限信号在 fs>2B 的均匀采样下可由样本完全重建，否则发生混叠（前提为带限、均匀采样）。",
+      "kind": "formal",
+      "sourceIds": [
+        "s.shannon1948",
+        "s.nyquist1928"
+      ],
+      "verified": "verified",
+      "verifiedAt": "2026-10-28T00:40:00.000Z"
+    },
+    {
+      "id": "c.rel.shannon-sampling",
+      "subject": {
+        "kind": "relation",
+        "id": "e.shannon-sampling"
+      },
+      "text": "香农 1948 年给出采样定理的正式表述，这是奈奎斯特-香农传统的历史影响，与信道容量问题不是同一问题。",
+      "kind": "historical",
+      "sourceIds": [
+        "s.shannon1948",
+        "s.nyquist1928"
+      ],
+      "verified": "verified",
+      "verifiedAt": "2026-10-28T00:40:00.000Z"
+    },
+    {
+      "id": "c.rel.shannon-variety",
+      "subject": {
+        "kind": "relation",
+        "id": "e.shannon-variety"
+      },
+      "text": "香农熵（概率分布下的平均不确定性）与艾什比多样性（状态集合计数）都度量可能状态的量，但定义不同；不是同一件事。",
+      "kind": "interpretation",
+      "sourceIds": [
+        "s.shannon1948",
+        "s.ashby1956"
+      ],
+      "verified": "verified",
+      "verifiedAt": "2026-10-28T00:40:00.000Z"
+    },
+    {
+      "id": "c.rel.shannon-measurement",
+      "subject": {
+        "kind": "relation",
+        "id": "e.shannon-measurement"
+      },
+      "text": "信息量与信道容量不度量语义、真实性与测量有效性；信息更多不等于认识更充分。",
+      "kind": "interpretation",
+      "sourceIds": [
+        "s.shannon1948"
+      ],
+      "verified": "verified",
+      "verifiedAt": "2026-10-28T00:40:00.000Z"
+    },
+    {
+      "id": "c.rel.measurement-blackbox",
+      "subject": {
+        "kind": "relation",
+        "id": "e.measurement-blackbox"
+      },
+      "text": "黑箱方法以输入—输出的可重复测量为前提；测量设计偏差会被行为模型原样继承。",
+      "kind": "interpretation",
+      "sourceIds": [
+        "s.ashby1956"
+      ],
+      "verified": "verified",
+      "verifiedAt": "2026-10-28T00:40:00.000Z"
+    },
+    {
+      "id": "c.rel.blackbox-model",
+      "subject": {
+        "kind": "relation",
+        "id": "e.blackbox-model"
+      },
+      "text": "黑箱行为模型与机制模型是两类模型：一个可操作、一个可解释；不是同一件事。",
+      "kind": "interpretation",
+      "sourceIds": [
+        "s.ashby1956"
+      ],
+      "verified": "verified",
+      "verifiedAt": "2026-10-28T00:40:00.000Z"
+    },
+    {
+      "id": "c.rel.homeostat-stability",
+      "subject": {
+        "kind": "relation",
+        "id": "e.homeostat-stability"
+      },
+      "text": "稳态器把'搜索稳定状态'做成可运行的装置；这是装置级应用，不是稳定性的一般证明。",
+      "kind": "interpretation",
+      "sourceIds": [
+        "s.ashby1952"
+      ],
+      "verified": "verified",
+      "verifiedAt": "2026-10-28T00:40:00.000Z"
+    },
+    {
+      "id": "c.rel.homeostat-adaptation",
+      "subject": {
+        "kind": "relation",
+        "id": "e.homeostat-adaptation"
+      },
+      "text": "Homeostat 是 Ashby 论证适应行为的示范装置；这是历史影响与示范，不是'任何适应都等于超稳定性'。",
+      "kind": "historical",
+      "sourceIds": [
+        "s.ashby1952"
+      ],
+      "verified": "verified",
+      "verifiedAt": "2026-10-28T00:40:00.000Z"
+    },
+    {
+      "id": "c.rel.measurement-controllability",
+      "subject": {
+        "kind": "relation",
+        "id": "e.measurement-controllability"
+      },
+      "text": "可观测性不等于可控性：能推断状态不代表存在足够的作用通道。",
+      "kind": "interpretation",
+      "sourceIds": [
+        "s.kalman1960",
+        "s.astrom2008"
+      ],
+      "verified": "secondary",
+      "verifiedAt": "2026-10-28T00:40:00.000Z"
+    },
+    {
+      "id": "c.rel.actuator-pi",
+      "subject": {
+        "kind": "relation",
+        "id": "e.actuator-pi"
+      },
+      "text": "执行器饱和时积分项仍在累积误差（积分饱和），恢复时会过冲。",
+      "kind": "empirical",
+      "sourceIds": [
+        "s.astrom2008",
+        "s.minorsky1922"
+      ],
+      "verified": "secondary",
+      "verifiedAt": "2026-10-28T00:40:00.000Z"
+    },
+    {
+      "id": "c.rel.actuator-robust",
+      "subject": {
+        "kind": "relation",
+        "id": "e.actuator-robust"
+      },
+      "text": "动作上限是鲁棒设计的边界：超出可达动作范围的扰动无法靠控制消化。",
+      "kind": "interpretation",
+      "sourceIds": [
+        "s.astrom2008",
+        "s.tsien1954"
+      ],
+      "verified": "secondary",
+      "verifiedAt": "2026-10-28T00:40:00.000Z"
+    },
+    {
+      "id": "c.rel.actuator-controllability",
+      "subject": {
+        "kind": "relation",
+        "id": "e.actuator-controllability"
+      },
+      "text": "执行器饱和把形式可控性缩成受限可达集；模型内可控不等于工程内可达。",
+      "kind": "interpretation",
+      "sourceIds": [
+        "s.kalman1960",
+        "s.astrom2008"
+      ],
+      "verified": "secondary",
+      "verifiedAt": "2026-10-28T00:40:00.000Z"
+    },
+    {
+      "id": "c.rel.controllability-variety",
+      "subject": {
+        "kind": "relation",
+        "id": "e.controllability-variety"
+      },
+      "text": "作用通道的数量不等于有效多样性；通道存在也不保证能区分并应对所有扰动。",
+      "kind": "interpretation",
+      "sourceIds": [
+        "s.ashby1956",
+        "s.kalman1960"
+      ],
+      "verified": "secondary",
+      "verifiedAt": "2026-10-28T00:40:00.000Z"
+    },
+    {
+      "id": "c.rel.adaptation-variety",
+      "subject": {
+        "kind": "relation",
+        "id": "e.adaptation-variety"
+      },
+      "text": "适应通过改变规则提高有效多样性；这是必要多样性理论在规则层面的工程应用。",
+      "kind": "interpretation",
+      "sourceIds": [
+        "s.ashby1952",
+        "s.ashby1956"
+      ],
+      "verified": "verified",
+      "verifiedAt": "2026-10-28T00:40:00.000Z"
+    },
+    {
+      "id": "c.rel.model-robust",
+      "subject": {
+        "kind": "relation",
+        "id": "e.model-robust"
+      },
+      "text": "讨论鲁棒性之前先要有可用的模型与扰动分类，否则'鲁棒'无法定义。",
+      "kind": "interpretation",
+      "sourceIds": [
+        "s.astrom2008",
+        "s.tsien1954"
+      ],
+      "verified": "secondary",
+      "verifiedAt": "2026-10-28T00:40:00.000Z"
+    },
+    {
+      "id": "c.rel.robust-tradeoff",
+      "subject": {
+        "kind": "relation",
+        "id": "e.robust-tradeoff"
+      },
+      "text": "鲁棒性以性能或资源为代价；代价不写出来就会以别处的故障形式回来。",
+      "kind": "interpretation",
+      "sourceIds": [
+        "s.astrom2008"
+      ],
+      "verified": "secondary",
+      "verifiedAt": "2026-10-28T00:40:00.000Z"
+    },
+    {
+      "id": "c.rel.tradeoff-goal",
+      "subject": {
+        "kind": "relation",
+        "id": "e.tradeoff-goal"
+      },
+      "text": "取舍最终要回到'被维持的量'与承担代价的一方；权重不是天然事实。",
+      "kind": "interpretation",
+      "sourceIds": [
+        "s.wiener1950",
+        "s.author-practice"
+      ],
+      "verified": "secondary",
+      "verifiedAt": "2026-10-28T00:40:00.000Z"
+    },
+    {
+      "id": "c.rel.model-agentloop",
+      "subject": {
+        "kind": "relation",
+        "id": "e.model-agentloop"
+      },
+      "text": "模型与前馈被迁移成任务契约里的'预判与回退'；这是工程应用。",
+      "kind": "interpretation",
+      "sourceIds": [
+        "s.author-practice"
+      ],
+      "verified": "unverified",
+      "verifiedAt": null
+    },
+    {
+      "id": "c.rel.vsm-cybersyn",
+      "subject": {
+        "kind": "relation",
+        "id": "e.vsm-cybersyn"
+      },
+      "text": "VSM 是 Cybersyn 项目背后的组织控制论；这是历史联系，项目实践不能直接证明模型普遍有效。",
+      "kind": "historical",
+      "sourceIds": [
+        "s.beer1972",
+        "s.medina2011"
+      ],
+      "verified": "verified",
+      "verifiedAt": "2026-10-28T00:40:00.000Z"
+    },
+    {
+      "id": "c.rel.vsm-variety",
+      "subject": {
+        "kind": "relation",
+        "id": "e.vsm-variety"
+      },
+      "text": "比尔的组织论述借用了调节与多样性思想；具体继承关系本包未逐条核对，这是历史联系而非等价。",
+      "kind": "historical",
+      "sourceIds": [
+        "s.beer1972",
+        "s.ashby1956"
+      ],
+      "verified": "secondary",
+      "verifiedAt": "2026-10-28T00:40:00.000Z"
+    },
+    {
+      "id": "c.rel.cybersyn-boundary",
+      "subject": {
+        "kind": "relation",
+        "id": "e.cybersyn-boundary"
+      },
+      "text": "Cybersyn 只覆盖接入电传网络的工厂，是系统边界概念在历史案例中的应用。",
+      "kind": "historical",
+      "sourceIds": [
+        "s.medina2011"
+      ],
+      "verified": "verified",
+      "verifiedAt": "2026-10-28T00:40:00.000Z"
+    },
+    {
+      "id": "c.rel.cybersyn-indicator",
+      "subject": {
+        "kind": "relation",
+        "id": "e.cybersyn-indicator"
+      },
+      "text": "统计指标成为 Cybersyn 的决策依据，是指标/代理目标概念在历史案例中的应用。",
+      "kind": "historical",
+      "sourceIds": [
+        "s.medina2011"
+      ],
+      "verified": "verified",
+      "verifiedAt": "2026-10-28T00:40:00.000Z"
+    },
+    {
+      "id": "c.rel.indicator-measurement",
+      "subject": {
+        "kind": "relation",
+        "id": "e.indicator-measurement"
+      },
+      "text": "指标是一种测量选择；先理解测量，才能理解代理指标为何会与目的脱钩。",
+      "kind": "interpretation",
+      "sourceIds": [
+        "s.goodhart1975",
+        "s.author-practice"
+      ],
+      "verified": "secondary",
+      "verifiedAt": "2026-10-28T00:40:00.000Z"
+    },
+    {
+      "id": "c.rel.secondorder-responsibility",
+      "subject": {
+        "kind": "relation",
+        "id": "e.secondorder-responsibility"
+      },
+      "text": "二阶控制论把观察者位置带出认识论讨论，引出'谁判定、谁负责'；这是历史影响。",
+      "kind": "historical",
+      "sourceIds": [
+        "s.foerster1974",
+        "s.wiener1950"
+      ],
+      "verified": "secondary",
+      "verifiedAt": "2026-10-28T00:40:00.000Z"
+    },
+    {
+      "id": "c.rel.responsibility-agentloop",
+      "subject": {
+        "kind": "relation",
+        "id": "e.responsibility-agentloop"
+      },
+      "text": "'谁验收、谁有权停止'被迁移到智能体任务契约；这是工程应用，文字承诺不等于真实权限。",
+      "kind": "interpretation",
+      "sourceIds": [
+        "s.author-practice"
+      ],
+      "verified": "unverified",
+      "verifiedAt": null
+    },
+    {
+      "id": "c.rel.agentloop-feedback",
+      "subject": {
+        "kind": "relation",
+        "id": "e.agentloop-feedback"
+      },
+      "text": "智能体工作过程可以被描述为反馈回路；这是工程类比应用，不是新的理论。",
+      "kind": "interpretation",
+      "sourceIds": [
+        "s.author-practice"
+      ],
+      "verified": "unverified",
+      "verifiedAt": null
+    },
+    {
+      "id": "c.rel.agentloop-measurement",
+      "subject": {
+        "kind": "relation",
+        "id": "e.agentloop-measurement"
+      },
+      "text": "智能体的验收就是它的测量环节；验收设计决定它能稳定地优化什么。",
+      "kind": "interpretation",
+      "sourceIds": [
+        "s.author-practice"
+      ],
+      "verified": "unverified",
+      "verifiedAt": null
+    },
+    {
+      "id": "c.rel.agentloop-actuator",
+      "subject": {
+        "kind": "relation",
+        "id": "e.agentloop-actuator"
+      },
+      "text": "智能体的权限与工具就是它的动作上限；先看能不能做，再看做得对不对。",
+      "kind": "interpretation",
+      "sourceIds": [
+        "s.author-practice"
+      ],
+      "verified": "unverified",
+      "verifiedAt": null
+    },
+    {
+      "id": "c.rel.agentloop-delay",
+      "subject": {
+        "kind": "relation",
+        "id": "e.agentloop-delay"
+      },
+      "text": "'改完到看见结果'的时间就是延迟，决定它一次能改多少。",
+      "kind": "interpretation",
+      "sourceIds": [
+        "s.author-practice"
+      ],
+      "verified": "unverified",
+      "verifiedAt": null
+    },
+    {
+      "id": "c.rel.agentloop-variety",
+      "subject": {
+        "kind": "relation",
+        "id": "e.agentloop-variety"
+      },
+      "text": "行动范围是给智能体的多样性预算：太窄做不了，太宽失控。",
+      "kind": "interpretation",
+      "sourceIds": [
+        "s.author-practice"
+      ],
+      "verified": "unverified",
+      "verifiedAt": null
+    },
+    {
+      "id": "c.rel.pi-agentloop",
+      "subject": {
+        "kind": "relation",
+        "id": "e.pi-agentloop"
+      },
+      "text": "'记住上次失败'像积分项；这是类比，不是同一机制——智能体的记忆与积分器在信号定义上并不相同。",
+      "kind": "interpretation",
+      "sourceIds": [
+        "s.minorsky1922",
+        "s.astrom2008"
+      ],
+      "verified": "secondary",
+      "verifiedAt": "2026-10-28T00:40:00.000Z"
+    }
+  ],
+  "experiments": [
+    {
+      "id": "delay",
+      "order": 1,
+      "title": "延迟下的反复纠正",
+      "subtitle": "确定性一阶惯性 + 纯延迟仿真",
+      "question": "延迟变大时，同一增益会从收敛变成振荡吗？",
+      "modelId": "delay-v2",
+      "modelVersion": 2,
+      "conceptNodeIds": [
+        "delay",
+        "stability",
+        "pi"
+      ],
+      "note": "教学模型，不是真实系统辨识：一阶惯性 + 纯延迟 + 比例控制，方程、单位、dt、初值与判定判据在证据面板内给出，同一参数可复现同一结果。"
+    },
+    {
+      "id": "proxy",
+      "order": 2,
+      "title": "指标改善，目的变差",
+      "subtitle": "可见/隐藏两个代理指标的交叉检查",
+      "question": "优化可见指标时，隐藏指标会怎样变化？",
+      "modelId": "proxy-v2",
+      "modelVersion": 2,
+      "conceptNodeIds": [
+        "indicator",
+        "positive",
+        "measurement"
+      ],
+      "note": "两个指标都由确定性公式生成，权重可调；用于区分「指标改善」与「目的改善」，不对应任何真实业务数据或用户。"
+    },
+    {
+      "id": "green",
+      "order": 3,
+      "title": "全绿却错",
+      "subtitle": "确定性分页检查器（沙盒，不是真实仓库）",
+      "question": "一组全部通过的检查，漏掉了哪个行为？",
+      "modelId": "green-v2",
+      "modelVersion": 2,
+      "conceptNodeIds": [
+        "measurement",
+        "feedback",
+        "boundary"
+      ],
+      "note": "检查器是插件内置的确定性逻辑，不读取你的仓库，也不代表真实项目事故；勾选默认关闭的越界用例即可看到「全绿」失效。"
+    }
+  ],
+  "completeness": {
+    "baselineCount": 40,
+    "baselineSource": "D:/plug-in/control-game/DeepSeek创造模式任务包/03-知识骨架.json 的 40 项候选种子（该文件自述为 development_input_not_verified_curriculum，未核验课程）；本包逐项交代去向，不按数字凑卡片。",
+    "baselineIds": [
+      "boundary",
+      "goal",
+      "state",
+      "wiener",
+      "rwb",
+      "negative",
+      "positive",
+      "disturbance",
+      "stock",
+      "maxwell",
+      "delay",
+      "sampling",
+      "stability",
+      "gain",
+      "filter",
+      "calibration",
+      "noise",
+      "shannon",
+      "observability",
+      "macy",
+      "saturation",
+      "controllability",
+      "variety",
+      "homeostat",
+      "adaptation",
+      "model",
+      "pid",
+      "prediction",
+      "robustness",
+      "tradeoff",
+      "proxy",
+      "beer",
+      "cybersyn",
+      "coordination",
+      "governance",
+      "observer",
+      "contract",
+      "evaluation",
+      "harness",
+      "revision"
+    ],
+    "included": [
+      "boundary",
+      "goal",
+      "state",
+      "wiener",
+      "observer",
+      "positive",
+      "variety",
+      "macy",
+      "delay",
+      "stability",
+      "sampling",
+      "shannon",
+      "homeostat",
+      "adaptation",
+      "controllability",
+      "model",
+      "tradeoff",
+      "cybersyn"
+    ],
+    "added": [
+      {
+        "id": "blackbox",
+        "why": "旧 24 节点 id 必须保留；黑箱方法是 Ashby 1956 第 6 章的独立方法，支撑测量与可观测性，但不在 40 项种子中单列，故记为新增（旧 id 保留）。"
+      },
+      {
+        "id": "secondorder",
+        "why": "旧 24 节点 id 必须保留；二阶控制论作为 observer 之上的专名入口，旧用户记录挂在该 id 上，故记为新增（旧 id 保留）。"
+      }
+    ],
+    "merged": [
+      {
+        "from": [
+          "negative"
+        ],
+        "to": "feedback",
+        "reason": "负反馈概念由旧 id feedback 承载；基线 negative 不另建节点，避免同名概念两处维护。"
+      },
+      {
+        "from": [
+          "rwb"
+        ],
+        "to": "feedback",
+        "reason": "《行为、目的与目的论》（1943）作为 feedback 的历史主张与来源保留，不单列论文节点。"
+      },
+      {
+        "from": [
+          "maxwell"
+        ],
+        "to": "feedback",
+        "reason": "麦克斯韦与调速器作为 feedback/stability 的历史主张与来源保留（见 relations 与 claims），不单列人物节点。"
+      },
+      {
+        "from": [
+          "disturbance"
+        ],
+        "to": "model",
+        "reason": "扰动与前馈在 model 节点的定义、机制与 limits 中合并交代；前馈/反馈分工即在此节点。"
+      },
+      {
+        "from": [
+          "stock"
+        ],
+        "to": "stability",
+        "reason": "存量/惯性作为稳定性的动态要素并入 stability 的机制说明，不单列。"
+      },
+      {
+        "from": [
+          "gain"
+        ],
+        "to": "stability",
+        "reason": "增益与稳定余量是 stability 的核心机制（增益、延迟、惯性的组合），合并以免同一参数两个卡片。"
+      },
+      {
+        "from": [
+          "calibration"
+        ],
+        "to": "measurement",
+        "reason": "标定是测量设计的一部分，并入 measurement 的 def/limits。"
+      },
+      {
+        "from": [
+          "noise"
+        ],
+        "to": "measurement",
+        "reason": "噪声与滤波代价并入 measurement 与 sampling 的 limits（采样太密会把噪声当信号）。"
+      },
+      {
+        "from": [
+          "observability"
+        ],
+        "to": "measurement",
+        "reason": "可观测性由旧 id measurement（标题即「测量与可观测性」）承载，形式判据写在 claims 中。"
+      },
+      {
+        "from": [
+          "saturation"
+        ],
+        "to": "actuator",
+        "reason": "执行器饱和由旧 id actuator（行动能力与饱和）承载。"
+      },
+      {
+        "from": [
+          "pid"
+        ],
+        "to": "pi",
+        "reason": "比例/积分/微分由旧 id pi 承载；微分项的取舍写在 pi 的 limits 与 claims 中。"
+      },
+      {
+        "from": [
+          "prediction"
+        ],
+        "to": "model",
+        "reason": "预测与滚动重规划属模型/前馈的工程延伸，并入 model 的 migrate 与 claims。"
+      },
+      {
+        "from": [
+          "robustness"
+        ],
+        "to": "robust",
+        "reason": "鲁棒性由旧 id robust 承载。"
+      },
+      {
+        "from": [
+          "proxy"
+        ],
+        "to": "indicator",
+        "reason": "代理指标由旧 id indicator 承载。"
+      },
+      {
+        "from": [
+          "beer"
+        ],
+        "to": "vsm",
+        "reason": "比尔的 VSM 由旧 id vsm 承载，不单列人物节点。"
+      },
+      {
+        "from": [
+          "coordination"
+        ],
+        "to": "vsm",
+        "reason": "分布式协调与局部自主并入 VSM 的协调/执行功能说明，不单列。"
+      },
+      {
+        "from": [
+          "governance"
+        ],
+        "to": "responsibility",
+        "reason": "目标权、退出与可撤回性由旧 id responsibility（责任与回路位置）承载。"
+      },
+      {
+        "from": [
+          "contract"
+        ],
+        "to": "agentloop",
+        "reason": "编程智能体任务契约由旧 id agentloop 承载（契约=为回路设定目标/测量/边界/停止条件）。"
+      },
+      {
+        "from": [
+          "evaluation"
+        ],
+        "to": "measurement",
+        "reason": "独立评价与证据链并入 measurement 的实践延伸与 agentloop 的验收主张，不单列。"
+      },
+      {
+        "from": [
+          "harness"
+        ],
+        "to": "agentloop",
+        "reason": "Harness/工具边界/反馈周期由旧 id agentloop 承载，作为工程迁移入口。"
+      }
+    ],
+    "excluded": [
+      {
+        "item": "filter",
+        "reason": "滤波与平滑是具体信号处理方法；其判断（降噪会引入迟滞）已写在 sampling 与 measurement 的 limits 中，本核心不单列方法卡片，以免把同一能力的多个特例堆成节点。"
+      },
+      {
+        "item": "revision",
+        "reason": "「反驳、修订与个人证据网络」由插件的数据与交互机制直接实现（notes/revisions/investigations/relations 批注），不在知识图谱里单列概念卡片——否则会把产品功能伪装成理论节点。修订的判据写在 secondorder 与 agentloop 的实践阶段中。"
+      }
+    ],
+    "gaps": [
+      {
+        "item": "maxwell1868 原件扫描",
+        "why": "Royal Society PDF 本机工具无法解析；已读 Crossref 摘要与维基文库转录，未逐页核对原件。",
+        "searchPath": "royalsocietypublishing.org DOI 10.1098/rspl.1867.0055；Wikisource: On_Governors"
+      },
+      {
+        "item": "wiener1948 正文",
+        "why": "archive.org 扫描受借阅限制，仅核对书目与馆藏记录。",
+        "searchPath": "archive.org/details/cyberneticsofcon0000unse；MIT Press 9780262537841"
+      },
+      {
+        "item": "conantashby1970 全文",
+        "why": "Taylor & Francis 付费墙，未读全文；形式定理按通行转述标 secondary。",
+        "searchPath": "doi.org/10.1080/00207727008920220；相邻文献综述"
+      },
+      {
+        "item": "macy 会议记录原文",
+        "why": "未读一手会议记录，仅核书目与二手研究（Heims 1991、Pias 2016 版本记录）。",
+        "searchPath": "Pias (ed.) 2016, OpenLibrary OL28586892M；Heims 1991, archive.org/details/cyberneticsgroup00heim"
+      },
+      {
+        "item": "vsm 五功能原文",
+        "why": "Beer 1972 全书未读，VSM 表述按通行二手描述。",
+        "searchPath": "OpenLibrary OL3054939W；Brain of the Firm (1972)"
+      },
+      {
+        "item": "goodhart 1975 原文",
+        "why": "未读原文；只有二手书目页与后人的概括，原文论证未逐句核对。",
+        "searchPath": "Papers in Monetary Economics vol.1, Reserve Bank of Australia (1975)"
+      },
+      {
+        "item": "foerster1974 原件",
+        "why": "未打开 BCL Report 73.38 原件，仅见 1995 年重印记录。",
+        "searchPath": "BCL Report 73.38 馆藏；OpenLibrary works/OL18508902W"
+      },
+      {
+        "item": "kalman1960 原文",
+        "why": "未读全文；秩条件按标准教材转述。",
+        "searchPath": "doi.org/10.1016/S1474-6670(17)70094-8；Åström & Murray Feedback Systems"
+      },
+      {
+        "item": "tsien1954 原文",
+        "why": "未读全书；仅核对 OpenLibrary 版本记录。",
+        "searchPath": "OpenLibrary OL20203656M；Engineering Cybernetics (McGraw-Hill, 1954)"
+      },
+      {
+        "item": "历史精确年份",
+        "why": "部分概念没有单一确定年份（boundary/goal/measurement/actuator/robust/tradeoff/delay/positive/state/agentloop），按契约用 eraPrecision:unknown 且 eraStart:null，不编年份。",
+        "searchPath": "按各节点 hist 与 sourceIds 追溯；需要一手史料时从 archive.org 扫描与馆藏记录继续"
+      },
+      {
+        "item": "agentloop 类实践主张",
+        "why": "属于作者判断，不是史料或形式结果；只能靠真实任务记录积累证据，本包明确标 unverified。",
+        "searchPath": "本插件的 investigations / experiments / notes（用户真实任务记录）"
+      }
+    ]
+  }
+}

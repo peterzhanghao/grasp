@@ -1,0 +1,5 @@
+{
+  "private": true,
+  "description": "QA 集成测试入口。Node >= 24 的 test runner 不再递归目录参数，此处用 main 指向 index.mjs，使 `node --test test/integration` 可直接运行全部集成测试（契约要求的命令）。",
+  "main": "index.mjs"
+}
