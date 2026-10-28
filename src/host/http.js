@@ -5,6 +5,7 @@
  * 任何异常都转成 { ok:false, code, error }，不向浏览器暴露堆栈。
  */
 import { AppError, statusFor, toErrorBody } from './errors.js'
+import { SCHEMA_VERSION } from '../domain/schema.js'
 
 const MAX_JSON_BYTES = 12 * 1024 * 1024
 const MAX_IMPORT_BYTES = 8 * 1024 * 1024
@@ -72,7 +73,7 @@ export function createHttpHandler({ storage, ops, dialog, resolveModel, version 
     sendJson(res, 200, {
       ok: true,
       version,
-      schemaVersion: 2,
+      schemaVersion: SCHEMA_VERSION,
       endpoint: '/api/loop-atlas',
       time: new Date().toISOString(),
     })
