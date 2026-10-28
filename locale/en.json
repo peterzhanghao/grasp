@@ -641,6 +641,19 @@
     "loop.time.hoursAgo": "{count} h ago",
     "loop.time.justNow": "just now",
     "loop.time.minutesAgo": "{count} min ago",
-    "loop.time.unknown": "Date uncertain"
+    "loop.time.unknown": "Date uncertain",
+    "loop.today.cta.answer": "Continue the six questions",
+    "loop.today.cta.archived": "Archived — start a new card",
+    "loop.today.cta.backfill": "Backfill this observation",
+    "loop.today.cta.checkEarly": "Check early",
+    "loop.today.cta.compare": "Compare prediction and outcome",
+    "loop.today.cta.designCheck": "Design a minimal test",
+    "loop.today.cta.designNext": "Design the next test",
+    "loop.today.cta.quick": "Do the 5-minute version",
+    "loop.today.cta.restart": "Restart this loop",
+    "loop.today.cta.startCheck": "Start this test",
+    "loop.today.tier.deep": "Deep",
+    "loop.today.tier.quick": "5 min",
+    "loop.today.tier.standard": "30 min"
   }
 }
