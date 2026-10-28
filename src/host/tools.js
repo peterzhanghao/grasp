@@ -14,9 +14,26 @@ const ACTIONS = [
   'list_evidence',
   'list_investigations',
   'list_tasks',
+  'read_loops',
+  'read_today',
   'save_note',
   'save_prediction',
+  'save_observation',
 ]
+
+/** agent 永远不能替用户写观察判定；这些字段出现在任何动作里都直接拒绝。 */
+const FORBIDDEN_ERROR = {
+  ok: false,
+  code: 'FORBIDDEN',
+  error: '观察判定（compare.verdict）只能由用户本人在界面上填写。agent 可以读取掌控卡与今天这一步，但不能替用户判断观察是支持还是反驳。',
+}
+
+function hasUserOnlyVerdict(args) {
+  if (!args || typeof args !== 'object') return false
+  if (args.verdict !== undefined) return true
+  if (args.compare && typeof args.compare === 'object' && args.compare.verdict !== undefined) return true
+  return false
+}
 
 function nodeById(core, id) {
   return (core.nodes || []).find((node) => node.id === id) || null
@@ -53,7 +70,7 @@ export function createToolDefinition({ storage, ops }) {
   return {
     name: 'loop_atlas',
     description:
-      '读取「掌控」知识图谱里的节点、关系、主张与来源，或在用户个人证据层保存笔记／预测。所有写操作与插件界面共用同一份实现；agent 写入的内容会标记为 ai-draft，不会被当作你的用户原文。',
+      '读取「掌控」知识图谱里的节点、关系、主张与来源，读取掌控卡与「今天这一步」，或在用户个人证据层保存笔记／预测。所有写操作与插件界面共用同一份实现；agent 写入的内容会标记为 ai-draft，不会被当作你的用户原文。观察判定（verdict）只能由用户本人填写，agent 只能读、不能写。',
     parameters: {
       type: 'object',
       properties: {
@@ -61,6 +78,7 @@ export function createToolDefinition({ storage, ops }) {
         nodeId: { type: 'string', description: 'read_node 的节点 id，例如 feedback / delay' },
         relationId: { type: 'string', description: 'read_relation 的关系稳定 id，例如 e.goal-to-feedback' },
         query: { type: 'string', description: 'search 的关键词' },
+        loopId: { type: 'string', description: 'read_today 可选：指定要读的掌控卡 id（缺省用当前激活的卡）' },
         subject: {
           type: 'object',
           description: '挂靠主题 {kind:"node"|"relation", id}',
@@ -80,6 +98,10 @@ export function createToolDefinition({ storage, ops }) {
     },
     async execute(args) {
       const action = args?.action
+      // 权限边界：观察 verdict 是用户自己的判断，工具层在任何动作下都拒绝代写。
+      if (action === 'save_observation' || action === 'observation.create' || hasUserOnlyVerdict(args)) {
+        return { ...FORBIDDEN_ERROR }
+      }
       const snap = await storage.ensure()
       if (snap.fatal) return { ok: false, code: 'READ_ONLY', error: snap.fatal.message }
       const core = snap.core
@@ -174,6 +196,60 @@ export function createToolDefinition({ storage, ops }) {
       if (action === 'list_tasks') {
         const tasks = Object.values(state.tasks || {}).sort((a, b) => String(b.updatedAt).localeCompare(String(a.updatedAt)))
         return { ok: true, tasks }
+      }
+
+      // 只读：掌控卡列表（按最近更新排序，附带当前激活卡）。
+      if (action === 'read_loops') {
+        const loops = Object.values(state.loops || {}).sort((a, b) => String(b.updatedAt).localeCompare(String(a.updatedAt)))
+        return {
+          ok: true,
+          readOnly: true,
+          activeLoopId: state.view?.activeLoopId || null,
+          count: loops.length,
+          loops,
+        }
+      }
+
+      // 只读：「今天这一步」视图——当前卡 / 缺口 / 下一步 / 最近观察，不写任何数据。
+      if (action === 'read_today') {
+        const activeLoopId = (typeof args?.loopId === 'string' && args.loopId) || state.view?.activeLoopId || null
+        const screen = state.view?.screen || 'home'
+        if (!activeLoopId) {
+          return {
+            ok: true,
+            readOnly: true,
+            screen,
+            activeLoopId: null,
+            loop: null,
+            gaps: [],
+            nextAction: null,
+            nextCheck: null,
+            observations: [],
+            hint: '还没有打开的掌控卡：先在六问向导里建一张卡（Q1 + Q6 有内容即可先建卡再补）。',
+          }
+        }
+        const loop = state.loops?.[activeLoopId] || null
+        if (!loop) return { ok: false, code: 'NOT_FOUND', error: '没有这张掌控卡：' + activeLoopId }
+        const observations = Object.values(state.observations || {})
+          .filter((observation) => observation.loopId === loop.id)
+          .sort((a, b) => String(b.at).localeCompare(String(a.at)))
+          .slice(0, 10)
+        const interventions = Object.values(state.interventions || {})
+          .filter((intervention) => intervention.loopId === loop.id)
+          .sort((a, b) => String(b.at).localeCompare(String(a.at)))
+          .slice(0, 5)
+        return {
+          ok: true,
+          readOnly: true,
+          screen,
+          activeLoopId: loop.id,
+          loop,
+          gaps: loop.gaps || [],
+          nextAction: loop.nextAction || null,
+          nextCheck: loop.nextCheck || null,
+          observations,
+          interventions,
+        }
       }
 
       if (action === 'save_note') {
