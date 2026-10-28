@@ -641,6 +641,19 @@
     "loop.time.hoursAgo": "{count} 小时前",
     "loop.time.justNow": "刚刚",
     "loop.time.minutesAgo": "{count} 分钟前",
-    "loop.time.unknown": "时间不确定"
+    "loop.time.unknown": "时间不确定",
+    "loop.today.cta.answer": "继续回答六问",
+    "loop.today.cta.archived": "已归档，开一张新卡",
+    "loop.today.cta.backfill": "回填这次观察",
+    "loop.today.cta.checkEarly": "提前看一次",
+    "loop.today.cta.compare": "对比预测与实际",
+    "loop.today.cta.designCheck": "设计一次最小检验",
+    "loop.today.cta.designNext": "设计下一次检验",
+    "loop.today.cta.quick": "只做 5 分钟版本",
+    "loop.today.cta.restart": "重启这条回路",
+    "loop.today.cta.startCheck": "开始这次检验",
+    "loop.today.tier.deep": "深度",
+    "loop.today.tier.quick": "5 分钟",
+    "loop.today.tier.standard": "30 分钟"
   }
 }

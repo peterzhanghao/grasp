@@ -589,6 +589,19 @@ export const FALLBACK_ZH = {
   'loop.settings.open': '打开掌控',
   'loop.settings.dataPath': '数据文件：{path}',
   'loop.sidebar.open': '掌控',
+  'loop.today.cta.answer': '继续回答六问',
+  'loop.today.cta.backfill': '回填这次观察',
+  'loop.today.cta.checkEarly': '提前看一次',
+  'loop.today.cta.designCheck': '设计一次最小检验',
+  'loop.today.cta.startCheck': '开始这次检验',
+  'loop.today.cta.compare': '对比预测与实际',
+  'loop.today.cta.designNext': '设计下一次检验',
+  'loop.today.cta.restart': '重启这条回路',
+  'loop.today.cta.archived': '已归档，开一张新卡',
+  'loop.today.cta.quick': '只做 5 分钟版本',
+  'loop.today.tier.quick': '5 分钟',
+  'loop.today.tier.standard': '30 分钟',
+  'loop.today.tier.deep': '深度',
 }
 
 export const FALLBACK_EN = {
@@ -1184,6 +1197,19 @@ export const FALLBACK_EN = {
   'loop.settings.open': 'Open Grasp',
   'loop.settings.dataPath': 'Data file: {path}',
   'loop.sidebar.open': 'Grasp',
+  'loop.today.cta.answer': 'Continue the six questions',
+  'loop.today.cta.backfill': 'Backfill this observation',
+  'loop.today.cta.checkEarly': 'Check early',
+  'loop.today.cta.designCheck': 'Design a minimal test',
+  'loop.today.cta.startCheck': 'Start this test',
+  'loop.today.cta.compare': 'Compare prediction and outcome',
+  'loop.today.cta.designNext': 'Design the next test',
+  'loop.today.cta.restart': 'Restart this loop',
+  'loop.today.cta.archived': 'Archived — start a new card',
+  'loop.today.cta.quick': 'Do the 5-minute version',
+  'loop.today.tier.quick': '5 min',
+  'loop.today.tier.standard': '30 min',
+  'loop.today.tier.deep': 'Deep',
 }
 
 /** 简单插值 translator；缺 key 返回 key 本身（与宿主 locale 行为一致）。 */
