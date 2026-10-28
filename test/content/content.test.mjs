@@ -337,3 +337,268 @@ test('locale：zh/en 完整对照、key 与 client 实际使用的 key 不缺失
     })
   }
 })
+
+// ─────────────────────────── 教练包（T04，Issue #9） ───────────────────────────
+// 契约：docs/v2-design.md §4（掌控六问）、§5（缺口 → 原理卡映射）、§10（四类系统模板），
+// docs/v2-dev-plan.md §3 T04。数据在 data/core.json 的 coach；文案在 locale/{zh,en}.json 的 loop.coach.*。
+
+const COACH_QUESTION_IDS = ['goal', 'measurement', 'action', 'disturbance', 'delay', 'hypothesis']
+const COACH_GAP_IDS = [
+  'unclear-goal',
+  'unmeasured',
+  'late-measurement',
+  'authority-gap',
+  'saturated',
+  'proxy',
+  'missing-counter-signal',
+  'oscillating',
+  'drift',
+  'adaptation-failure',
+]
+const COACH_TEMPLATE_IDS = ['coding-agent', 'product', 'team', 'personal']
+const COACH_LOCALE_PREFIX = 'loop.coach.'
+const WIZARD_TOP_KEYS = [
+  'titleKey',
+  'introKey',
+  'progressKey',
+  'skipKey',
+  'unknownHintKey',
+  'draftSavedKey',
+  'createCardKey',
+  'createCardHintKey',
+]
+/** 教练包文案 key 的冻结数量：缺口 10×2 + 模板 4×13 + 向导（8 顶层 + 6×3）。 */
+const COACH_KEY_COUNT = 10 * 2 + 4 * (1 + 6 * 2) + 8 + 6 * 3
+
+const isObj = (v) => v !== null && typeof v === 'object' && !Array.isArray(v)
+const readLocaleFile = (name) => JSON.parse(readFileSync(join(root, 'locale', name), 'utf8'))
+const zhLoc = readLocaleFile('zh.json')
+const enLoc = readLocaleFile('en.json')
+const placeholdersOf = (text) => [...text.matchAll(/\{([A-Za-z0-9_]+)\}/g)].map((m) => m[1]).sort()
+
+/** 收集 coach 元数据里引用的全部 loop.* 文案 key（递归）。 */
+function collectCoachLocaleRefs(value, out = new Set()) {
+  if (typeof value === 'string') {
+    if (value.startsWith('loop.')) out.add(value)
+  } else if (Array.isArray(value)) {
+    for (const item of value) collectCoachLocaleRefs(item, out)
+  } else if (isObj(value)) {
+    for (const item of Object.values(value)) collectCoachLocaleRefs(item, out)
+  }
+  return out
+}
+const coachLocaleRefs = [...collectCoachLocaleRefs(core.coach)].sort()
+const coachLocaleKeys = (loc) => Object.keys(loc.messages).filter((k) => k.startsWith(COACH_LOCALE_PREFIX)).sort()
+
+/** 断言某文案 key 在 zh/en 都存在且是非空字符串，返回 {zh,en}。 */
+function assertCopy(key, { minZh = 1, minEn = 1, where = '' } = {}) {
+  const text = {}
+  for (const [name, loc] of [
+    ['zh', zhLoc],
+    ['en', enLoc],
+  ]) {
+    assert.ok(key in loc.messages, `${where} 引用的文案 key 在 locale/${name}.json 中不存在：${key}`)
+    const value = loc.messages[key]
+    assert.ok(typeof value === 'string' && value.trim().length > 0, `locale/${name}.json 的 ${key} 文案为空`)
+    text[name] = value
+  }
+  assert.ok(text.zh.length >= minZh, `${key} 的中文文案太短（${text.zh.length} 字），要具体可操作`)
+  assert.ok(text.en.length >= minEn, `${key} 的英文文案太短（${text.en.length} 字符）`)
+  return text
+}
+
+test('教练包：结构完整，六问顺序与四类系统模板齐全', async () => {
+  const coach = core.coach
+  assert.ok(isObj(coach), 'data/core.json 缺少 coach 元数据（T04 教练包）')
+  assert.equal(coach.version, 1, 'coach.version 应为 1（后续变更才升版）')
+  assert.deepEqual(coach.questionOrder, COACH_QUESTION_IDS, '六问顺序必须与设计 §4 一致：目标量/测量/动作权限/扰动/延迟/解释与推翻条件')
+
+  // 与 domain 枚举对齐：缺口类型、系统类型是 T01/T02/T03 的共同契约
+  const loopSchemaPath = join(root, 'src', 'domain', 'loop-schema.js')
+  if (existsSync(loopSchemaPath)) {
+    const schema = await import(pathToFileURL(loopSchemaPath).href)
+    assert.deepEqual([...COACH_GAP_IDS].sort(), [...schema.GAP_TYPES].sort(), 'gapPlaybook 必须覆盖 domain 的全部 10 类缺口')
+    const nonCustomTypes = schema.SYSTEM_TYPES.filter((t) => t !== 'custom')
+    assert.deepEqual([...COACH_TEMPLATE_IDS].sort(), [...nonCustomTypes].sort(), '四类系统模板必须覆盖 domain 中除 custom 外的 SYSTEM_TYPES')
+    // 掌控卡字段预填模板（dev-plan T04）：路径根必须在 LOOP_DEFAULTS 里存在
+    assert.ok(isObj(coach.fieldMap), 'coach.fieldMap 缺失（六问 → 掌控卡字段预填）')
+    assert.deepEqual(Object.keys(coach.fieldMap).sort(), [...COACH_QUESTION_IDS].sort(), 'fieldMap 必须覆盖六问')
+    for (const [question, paths] of Object.entries(coach.fieldMap)) {
+      assert.ok(Array.isArray(paths) && paths.length > 0, `fieldMap.${question} 必须是非空数组`)
+      for (const path of paths) {
+        assert.match(path, /^[a-zA-Z]+(?:\[\])?(?:\.[a-zA-Z]+)*$/, `fieldMap.${question} 的字段路径非法：${path}`)
+        const rootField = path.split('.')[0].replace(/\[\]$/, '')
+        assert.ok(rootField in schema.LOOP_DEFAULTS, `fieldMap.${question} 引用了掌控卡不存在的字段：${path}`)
+      }
+    }
+  }
+
+  // gapPlaybook：10 类缺口、每类 1—2 张已存在的原理卡 + 首个动作 key
+  assert.ok(isObj(coach.gapPlaybook), 'coach.gapPlaybook 缺失')
+  assert.deepEqual(Object.keys(coach.gapPlaybook).sort(), [...COACH_GAP_IDS].sort(), 'gapPlaybook 必须恰好包含 10 类缺口')
+  for (const [gap, entry] of Object.entries(coach.gapPlaybook)) {
+    assert.ok(isObj(entry), `gapPlaybook.${gap} 必须是对象`)
+    assert.match(entry.labelKey, /^loop\.coach\.gap\.[a-z-]+\.label$/, `gapPlaybook.${gap}.labelKey 命名非法`)
+    assert.match(entry.firstActionKey, /^loop\.coach\.gap\.[a-z-]+\.firstAction$/, `gapPlaybook.${gap}.firstActionKey 命名非法`)
+    assert.ok(Array.isArray(entry.nodeIds), `gapPlaybook.${gap}.nodeIds 必须是数组`)
+    assert.ok(entry.nodeIds.length >= 1 && entry.nodeIds.length <= 2, `gapPlaybook.${gap} 必须映射 1—2 张原理卡，实际 ${entry.nodeIds.length} 张`)
+    assert.equal(new Set(entry.nodeIds).size, entry.nodeIds.length, `gapPlaybook.${gap}.nodeIds 不能重复`)
+  }
+
+  // systemTemplates：四类，各含 labelKey + 六问 questionHints + 六问 examples
+  assert.ok(isObj(coach.systemTemplates), 'coach.systemTemplates 缺失')
+  assert.deepEqual(Object.keys(coach.systemTemplates).sort(), [...COACH_TEMPLATE_IDS].sort(), '四类系统模板必须齐全')
+  for (const [type, template] of Object.entries(coach.systemTemplates)) {
+    assert.ok(isObj(template), `systemTemplates.${type} 必须是对象`)
+    assert.match(template.labelKey, /^loop\.coach\.template\.[a-z-]+\.label$/, `systemTemplates.${type}.labelKey 命名非法`)
+    assert.deepEqual(Object.keys(template.questionHints).sort(), [...COACH_QUESTION_IDS].sort(), `${type} 缺六问 questionHints`)
+    assert.deepEqual(Object.keys(template.examples).sort(), [...COACH_QUESTION_IDS].sort(), `${type} 缺六问 examples`)
+  }
+
+  // wizardCopy：六问标题/提示/「我不知道」分支 + 进度 + 建卡按钮等 key 引用
+  assert.ok(isObj(coach.wizardCopy), 'coach.wizardCopy 缺失')
+  for (const field of WIZARD_TOP_KEYS) {
+    assert.ok(typeof coach.wizardCopy[field] === 'string', `wizardCopy.${field} 必须是文案 key`)
+    assert.match(coach.wizardCopy[field], /^loop\.coach\.wizard\./, `wizardCopy.${field} 命名必须以 loop.coach.wizard. 开头`)
+  }
+  assert.deepEqual(Object.keys(coach.wizardCopy.questions).sort(), [...COACH_QUESTION_IDS].sort(), 'wizardCopy.questions 必须覆盖六问')
+  for (const question of COACH_QUESTION_IDS) {
+    const entry = coach.wizardCopy.questions[question]
+    for (const field of ['titleKey', 'hintKey', 'unknownKey']) {
+      assert.ok(typeof entry[field] === 'string', `wizardCopy.questions.${question}.${field} 必须是文案 key`)
+      assert.match(entry[field], /^loop\.coach\.question\./, `wizardCopy.questions.${question}.${field} 命名非法`)
+    }
+  }
+})
+
+test('教练包：缺口映射引用闭合（nodeId 存在、文案 key 存在且可操作）', () => {
+  for (const gap of COACH_GAP_IDS) {
+    const entry = core.coach.gapPlaybook[gap]
+    for (const nodeId of entry.nodeIds) {
+      assert.ok(nodeById.has(nodeId), `缺口 ${gap} 引用了不存在的原理卡节点：${nodeId}`)
+    }
+    assertCopy(entry.labelKey, { minZh: 2, minEn: 3, where: `缺口 ${gap} 的 labelKey` })
+    const action = assertCopy(entry.firstActionKey, { minZh: 30, minEn: 60, where: `缺口 ${gap} 的 firstActionKey` })
+    // 「第一个小动作」必须是一个动作，而不是口号/占位
+    assert.ok(!/待补充|待定义|TODO|TBD|lorem/i.test(action.zh + action.en), `缺口 ${gap} 的首个动作文案像占位符：${entry.firstActionKey}`)
+    assert.ok(/[。；]/u.test(action.zh), `缺口 ${gap} 的首个动作中文应是完整句子：${action.zh}`)
+  }
+
+  // 首个动作不能是同一句复制粘贴；缺口映射至少覆盖 10 张不同原理卡（29 张里挑得出推荐）
+  const actions = COACH_GAP_IDS.map((gap) => core.coach.gapPlaybook[gap].firstActionKey)
+  assert.equal(new Set(actions).size, actions.length, '不同缺口的 firstActionKey 不能重复')
+  const referencedNodes = new Set(COACH_GAP_IDS.flatMap((gap) => core.coach.gapPlaybook[gap].nodeIds))
+  assert.ok(referencedNodes.size >= 10, `缺口 → 原理卡映射覆盖的节点过少（${referencedNodes.size} 张）`)
+  // 设计 §5 的映射以内容包现有卡片为准：不允许映射到 group 入口之外的编造 id
+  for (const nodeId of referencedNodes) {
+    const node = nodeById.get(nodeId)
+    assert.ok(node.groupId, `缺口映射到的节点 ${nodeId} 缺 groupId，不是完整内容卡`)
+  }
+})
+
+test('教练包：四类系统模板六问 hint/example 齐全且各自定制', () => {
+  const templates = core.coach.systemTemplates
+  for (const type of COACH_TEMPLATE_IDS) {
+    const template = templates[type]
+    assertCopy(template.labelKey, { minZh: 3, minEn: 5, where: `模板 ${type} 的 labelKey` })
+    for (const question of COACH_QUESTION_IDS) {
+      const hintKey = template.questionHints[question]
+      const exampleKey = template.examples[question]
+      assert.match(hintKey, /^loop\.coach\.template\./, `模板 ${type}.${question} 的 hintKey 命名非法`)
+      assert.match(exampleKey, /^loop\.coach\.template\./, `模板 ${type}.${question} 的 exampleKey 命名非法`)
+      const hint = assertCopy(hintKey, { minZh: 15, minEn: 30, where: `模板 ${type} 的 ${question} 提示` })
+      const example = assertCopy(exampleKey, { minZh: 12, minEn: 25, where: `模板 ${type} 的 ${question} 示例` })
+      assert.notEqual(hint.zh, hint.en, `模板 ${type}.${question} 的提示未翻译`)
+      assert.notEqual(example.zh, example.en, `模板 ${type}.${question} 的示例未翻译`)
+      // 示例是「一个答案」而不是再抛一个问题
+      assert.ok(!example.zh.trim().endsWith('？'), `模板 ${type}.${question} 的 example 应是示例答案，不是问句：${example.zh}`)
+    }
+  }
+
+  // 定制性：同一问在四类模板中的提示/示例必须互不相同（否则只是占位复制）
+  for (const question of COACH_QUESTION_IDS) {
+    for (const [name, loc] of [
+      ['zh', zhLoc],
+      ['en', enLoc],
+    ]) {
+      const hints = COACH_TEMPLATE_IDS.map((type) => loc.messages[templates[type].questionHints[question]])
+      assert.equal(new Set(hints).size, COACH_TEMPLATE_IDS.length, `${name} 的四类模板在「${question}」上提示重复，未按系统类型定制`)
+      const examples = COACH_TEMPLATE_IDS.map((type) => loc.messages[templates[type].examples[question]])
+      assert.equal(new Set(examples).size, COACH_TEMPLATE_IDS.length, `${name} 的四类模板在「${question}」上示例重复，未按系统类型定制`)
+    }
+  }
+  const labelsZh = COACH_TEMPLATE_IDS.map((type) => zhLoc.messages[templates[type].labelKey])
+  assert.equal(new Set(labelsZh).size, COACH_TEMPLATE_IDS.length, '四类模板的中文标签必须互不相同')
+})
+
+test('教练包：向导六问标题/提示/「我不知道」分支/进度/建卡按钮文案齐全且具体', () => {
+  const wizard = core.coach.wizardCopy
+  for (const field of WIZARD_TOP_KEYS) {
+    assertCopy(wizard[field], { minZh: 4, minEn: 8, where: `wizardCopy.${field}` })
+  }
+  // 进度文案必须是「第 N 问 / 共 M 问」这类可代入的模板
+  assert.deepEqual(placeholdersOf(zhLoc.messages[wizard.progressKey]), ['current', 'total'], 'progressKey 中文必须含 {current} 与 {total}')
+  assert.deepEqual(placeholdersOf(enLoc.messages[wizard.progressKey]), ['current', 'total'], 'progressKey 英文必须含 {current} 与 {total}')
+  // 建卡门槛：设计 §4「Q1 与 Q6 有内容即可先建卡再补」
+  assert.match(zhLoc.messages[wizard.createCardHintKey], /第 1 问.*第 6 问/, '建卡门槛文案应说明「第 1 问 + 第 6 问」即可建卡')
+  assert.match(enLoc.messages[wizard.createCardHintKey], /Q1.*Q6/, '建卡门槛文案（en）应说明 Q1 + Q6 即可建卡')
+
+  for (const question of COACH_QUESTION_IDS) {
+    const entry = wizard.questions[question]
+    const title = assertCopy(entry.titleKey, { minZh: 6, minEn: 15, where: `六问 ${question} 的标题` })
+    assert.match(title.zh, /？$/, `六问 ${question} 的中文标题应是问句：${title.zh}`)
+    assert.match(title.en, /\?$/, `六问 ${question} 的英文标题应是问句：${title.en}`)
+    const hint = assertCopy(entry.hintKey, { minZh: 15, minEn: 30, where: `六问 ${question} 的提示` })
+    const unknown = assertCopy(entry.unknownKey, { minZh: 20, minEn: 40, where: `六问 ${question} 的「我不知道」分支` })
+    assert.notEqual(hint.zh, hint.en, `六问 ${question} 的提示未翻译`)
+    assert.notEqual(unknown.zh, unknown.en, `六问 ${question} 的「我不知道」分支未翻译`)
+  }
+
+  // 占位符 zh/en 必须一致（{current}/{total} 等参数不会一边有一边没有）
+  const wizardKeys = [...WIZARD_TOP_KEYS.map((field) => wizard[field])]
+  for (const question of COACH_QUESTION_IDS) {
+    wizardKeys.push(...Object.values(wizard.questions[question]))
+  }
+  for (const key of wizardKeys) {
+    assert.deepEqual(
+      placeholdersOf(zhLoc.messages[key]),
+      placeholdersOf(enLoc.messages[key]),
+      `文案 ${key} 的占位符在 zh/en 中不一致`,
+    )
+  }
+})
+
+test('教练包：locale 的 loop.coach.* 与 core 引用双向闭合、zh/en 集合一致、文案非空', () => {
+  assert.ok(coachLocaleRefs.length > 0, 'coach 元数据没有引用任何 loop.* 文案 key')
+  assert.equal(coachLocaleRefs.length, COACH_KEY_COUNT, `教练包文案 key 应为 ${COACH_KEY_COUNT} 个（缺口 20 + 模板 52 + 向导 26）`)
+  assert.equal(new Set(coachLocaleRefs).size, coachLocaleRefs.length, 'coach 元数据里的文案 key 不能重复引用')
+
+  const zhKeys = coachLocaleKeys(zhLoc)
+  const enKeys = coachLocaleKeys(enLoc)
+  assert.deepEqual(zhKeys, coachLocaleRefs, 'locale/zh.json 的 loop.coach.* 必须与 core.coach 引用完全一致（无缺失、无死文案）')
+  assert.deepEqual(enKeys, coachLocaleRefs, 'locale/en.json 的 loop.coach.* 必须与 core.coach 引用完全一致（无缺失、无死文案）')
+  assert.deepEqual(zhKeys, enKeys, 'zh/en 的 loop.coach.* key 集合必须一致')
+
+  for (const key of coachLocaleRefs) {
+    const zhText = zhLoc.messages[key]
+    const enText = enLoc.messages[key]
+    assert.ok(typeof zhText === 'string' && zhText.trim().length >= 2, `locale/zh.json 的 ${key} 文案为空`)
+    assert.ok(typeof enText === 'string' && enText.trim().length >= 2, `locale/en.json 的 ${key} 文案为空`)
+    assert.ok(!/\s{2,}/.test(zhText.trim()), `locale/zh.json 的 ${key} 含连续空格，疑似排版残留`)
+    assert.notEqual(zhText, enText, `locale 的 ${key} 中英文相同，疑似未翻译`)
+  }
+})
+
+test('教练包：新增元数据不破坏内容校验（validateContent 仍 ok）', async () => {
+  const validatePath = join(root, 'src', 'domain', 'validate-content.js')
+  assert.ok(existsSync(validatePath), '缺少 src/domain/validate-content.js')
+  const { validateContent } = await import(pathToFileURL(validatePath).href)
+  const result = validateContent(core)
+  assert.equal(result.ok, true, `validateContent(core) 失败：${JSON.stringify(result.errors.slice(0, 5))}`)
+  assert.equal(result.errors.length, 0, 'validateContent(core) 不能有错误')
+  // 29 节点 / 55 关系 / 119 主张 / 21 来源的正文与来源不得被教练包改动
+  assert.equal(core.nodes.length, 29, '节点数必须保持 29（教练包不改节点正文）')
+  assert.equal(core.relations.length, 55, '关系数必须保持 55')
+  assert.equal(core.claims.length, 119, '主张数必须保持 119')
+  assert.equal(core.sources.length, 21, '来源数必须保持 21')
+})
