@@ -2,7 +2,7 @@ import test from 'node:test'
 import assert from 'node:assert/strict'
 import { existsSync, readFileSync } from 'node:fs'
 
-import { migrateV1, detectEncodingSuspicion, parseLegacyContractText, LEGACY_EXPERIMENT_ID_MAP } from '../../src/domain/migrate.js'
+import { migrateV1, migrateV2, migrateToV3, detectEncodingSuspicion, parseLegacyContractText, LEGACY_EXPERIMENT_ID_MAP } from '../../src/domain/migrate.js'
 import { validateState, SCHEMA_VERSION } from '../../src/domain/schema.js'
 import { makeV1State } from './fixtures/state-v1.mjs'
 import { makeMiniCore } from './fixtures/mini-core.mjs'
@@ -20,7 +20,7 @@ test('migrateV1：备份标记、计数、meta 与 report 汇总', () => {
   assert.equal(report.ok, true)
   assert.equal(report.already, false)
   assert.equal(report.fromSchema, 1)
-  assert.equal(report.toSchema, SCHEMA_VERSION)
+  assert.equal(report.toSchema, 2, 'v1→v2 是中间态，最终版本由 migrateV2 继续推到 v3')
   assert.equal(report.requiresBackup, true)
   assert.equal(report.backupPath, 'D:\\backup\\state.pre-v2.json')
   assert.equal(report.migratedAt, NOW)
@@ -32,7 +32,7 @@ test('migrateV1：备份标记、计数、meta 与 report 汇总', () => {
   assert.equal(report.counts.legacyOriginUncertain, 3)
   assert.deepEqual(report.encodingSuspected, ['n_fixture_garbled'])
 
-  assert.equal(state.schemaVersion, SCHEMA_VERSION)
+  assert.equal(state.schemaVersion, 2, 'migrateV1 输出 v2 中间态')
   assert.equal(state.meta.fromSchema, 1)
   assert.equal(state.meta.migratedAt, NOW)
   assert.equal(state.meta.backupPath, 'D:\\backup\\state.pre-v2.json')
@@ -132,8 +132,13 @@ test('migrateV1：view 迁移（上次落点 → subject 尺度 + selectedNodeId
   })
 })
 
-test('migrateV1：迁移结果通过全量校验（结构与引用闭合）', () => {
-  const { state } = migrateV1(makeV1State(), { now: NOW })
+test('migrateToV3：v1 → v2 → v3 链，结果通过全量校验（结构与引用闭合）', () => {
+  const { state, report } = migrateToV3(makeV1State(), { now: NOW })
+  assert.equal(report.ok, true)
+  assert.equal(report.fromSchema, 1)
+  assert.equal(report.toSchema, SCHEMA_VERSION)
+  assert.deepEqual(report.chain, ['v1->v2', 'v2->v3'])
+  assert.equal(state.schemaVersion, SCHEMA_VERSION)
   const result = validateState(state, { core })
   assert.equal(result.ok, true, JSON.stringify(result.errors))
 })
@@ -214,4 +219,48 @@ test('真实 v1 state.json（只读）迁移 smoke：源文件不被修改、可
     const result = validateState(state, { core: currentCore })
     assert.equal(result.ok, true, JSON.stringify(result.errors))
   }
+})
+
+test('migrateV2：研究问题映射为掌控卡，预测/实验映射为干预或观察，v2 表保留', () => {
+  const { state: v2 } = migrateV1(makeV1State(), { now: NOW, backupPath: 'D:\\backup\\state.pre-v3.json' })
+  v2.investigations = {
+    inv_1: {
+      id: 'inv_1',
+      subject: { kind: 'node', id: 'delay' },
+      title: '延迟与振荡',
+      claim: 'D=1.2 时振荡由延迟放大',
+      counter: '可能是增益过大',
+      nextTest: '把 K 降到 0.6 再跑一次',
+      status: 'testing',
+      predictionIds: ['p_fixture_open'],
+      experimentRunIds: ['e_fixture_delay'],
+      dialogSubjectKey: '',
+      createdAt: NOW,
+      updatedAt: NOW,
+    },
+  }
+  v2.predictions.p_fixture_open.investigationId = 'inv_1'
+
+  const { state, report } = migrateV2(v2, { now: NOW })
+  assert.equal(report.ok, true)
+  assert.equal(report.fromSchema, 2)
+  assert.equal(report.toSchema, SCHEMA_VERSION)
+  assert.equal(state.schemaVersion, SCHEMA_VERSION)
+  assert.equal(state.loops.lp_inv_1.status, 'testing')
+  assert.equal(state.loops.lp_inv_1.hypothesis.claim, 'D=1.2 时振荡由延迟放大')
+  assert.equal(state.loops.lp_inv_1.nextAction.text, '把 K 降到 0.6 再跑一次')
+  assert.equal(state.interventions.iv_p_fixture_open.status, 'planned')
+  assert.equal(state.observations.ob_p_fixture_resolved_legacy.compare.verdict, 'inconclusive')
+  assert.equal(state.observations.ob_run_e_fixture_delay.source, 'experiment')
+  assert.ok(state.loops.lp_legacy_v2, '无归属的实验/旧预测要有 legacy 卡兜底')
+  // v2 旧表原样保留，可追溯、可回退
+  assert.equal(state.investigations.inv_1.title, '延迟与振荡')
+  assert.equal(state.notes.n_fixture_evidence.text, '示例证据：D=1.2 时穿越目标 6 次。')
+  assert.equal(state.meta.backupPath, 'D:\\backup\\state.pre-v3.json')
+  const check = validateState(state, { core })
+  assert.equal(check.ok, true, JSON.stringify(check.errors))
+
+  const again = migrateV2(state, { now: NOW })
+  assert.equal(again.report.already, true)
+  assert.deepEqual(again.state, state)
 })

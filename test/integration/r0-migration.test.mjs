@@ -82,7 +82,7 @@ function v1Fixture() {
 
 function assertMigrationShape(state, label) {
   assert.equal(state.ok, true, label + '：ok 应为 true，fatal=' + JSON.stringify(state.fatal))
-  assert.equal(state.schemaVersion, 2, label + '：schemaVersion')
+  assert.equal(state.schemaVersion, 3, label + '：schemaVersion')
   const notes = state.store.notes || {}
   assert.ok(notes.n_v1_user, label + '：迁移丢失笔记 n_v1_user')
   assert.ok(notes.n_v1_garbled, label + '：迁移丢失笔记 n_v1_garbled')
@@ -129,14 +129,15 @@ test('R0 · v1 迁移：结构/来源标记/备份逐字节一致/回滚/幂等'
 
     // 备份文件必须存在且与迁移前原文件逐字节一致
     const backupDir = join(dataDir, 'backups')
-    const backupNames = (await readdir(backupDir).catch(() => [])).filter((name) => /^state\.pre-v2-.*\.json$/.test(name))
-    assert.ok(backupNames.length >= 1, '没有 state.pre-v2-*.json 备份文件')
+    const backupNames = (await readdir(backupDir).catch(() => [])).filter((name) => /^state\.pre-v3-.*\.json$/.test(name))
+    assert.ok(backupNames.length >= 1, '没有 state.pre-v3-*.json 备份文件')
     const backupText = await readFile(join(backupDir, backupNames[0]), 'utf8')
     assert.equal(backupText, v1Text, '迁移前备份与原始 v1 文件不一致（不能用于回滚）')
 
-    // 迁移后的磁盘文件是合法 v2
+    // 迁移后的磁盘文件是合法 v3
     const diskAfter = JSON.parse(await readFile(join(dataDir, 'state.json'), 'utf8'))
-    assert.equal(diskAfter.schemaVersion, 2, '迁移后磁盘 schemaVersion')
+    assert.equal(diskAfter.schemaVersion, 3, '迁移后磁盘 schemaVersion')
+    assert.ok(diskAfter.loops && diskAfter.interventions && diskAfter.observations, '缺少 v3 表')
 
     // 回滚：把备份还原成 state.json 后重启，数据仍可读（会再次迁移）
     await host.dispose({ cleanupData: false })
@@ -146,10 +147,10 @@ test('R0 · v1 迁移：结构/来源标记/备份逐字节一致/回滚/幂等'
     const rolledBack = (await host.get('/api/loop-atlas/state')).body
     assertMigrationShape(rolledBack, '回滚重启')
     assert.ok(rolledBack.migrationReport, '回滚重启后应再次迁移并报告')
-    const backupNames2 = (await readdir(backupDir)).filter((name) => /^state\.pre-v2-.*\.json$/.test(name))
+    const backupNames2 = (await readdir(backupDir)).filter((name) => /^state\.pre-v3-.*\.json$/.test(name))
     assert.ok(backupNames2.length >= 2, '回滚后再次迁移没有新增备份：' + backupNames2.length)
 
-    // 幂等：已是 v2 的数据再次启动不应重复迁移，也不应改写用户数据
+    // 幂等：已是 v3 的数据再次启动不应重复迁移，也不应改写用户数据
     await host.dispose({ cleanupData: false })
     host = null
     const v2Before = JSON.parse(await readFile(join(dataDir, 'state.json'), 'utf8'))

@@ -11,7 +11,7 @@ import { readFile, mkdir, rename, copyFile, open, readdir, stat, unlink } from '
 import { join } from 'node:path'
 import { AppError, fromStorageFailure } from './errors.js'
 import { SCHEMA_VERSION, emptyState, validateState } from '../domain/schema.js'
-import { migrateV1 } from '../domain/migrate.js'
+import { migrateToV3 } from '../domain/migrate.js'
 import { validateContent } from '../domain/validate-content.js'
 
 const MAX_STATE_BYTES = 64 * 1024 * 1024
@@ -178,8 +178,11 @@ export function createStorage({ dataDir, coreFile, logger }) {
   }
 
   async function migrate(raw) {
-    const backupPath = await backupFile('pre-v2')
-    const { state, report } = migrateV1(raw)
+    const backupPath = await backupFile('pre-v3')
+    const { state, report } = migrateToV3(raw, { backupPath, contentVersion: core?.version || null })
+    if (!report.ok || !state) {
+      throw new AppError('INTERNAL', '迁移失败：' + String(report.error || '未知原因'), { backupPath })
+    }
     // 把备份路径与内容版本写进 meta，用户能在界面里看到"迁移前文件在哪"。
     if (state.meta) {
       if (backupPath) state.meta.backupPath = backupPath
@@ -202,19 +205,12 @@ export function createStorage({ dataDir, coreFile, logger }) {
     await writeStateAtomic(state)
     const readBack = JSON.parse(await readFile(stateFile, 'utf8'))
     const count = (value) => Object.keys(value || {}).length
-    const counts = {
-      notes: count(state.notes),
-      revisions: count(state.revisions),
-      predictions: count(state.predictions),
-      experiments: count(state.experiments),
-      tasks: count(state.tasks),
-    }
-    const readCounts = {
-      notes: count(readBack.notes),
-      revisions: count(readBack.revisions),
-      predictions: count(readBack.predictions),
-      experiments: count(readBack.experiments),
-      tasks: count(readBack.tasks),
+    const tables = ['notes', 'revisions', 'predictions', 'experiments', 'tasks', 'interventions', 'observations']
+    const counts = { loops: count(state.loops), investigations: count(state.investigations) }
+    const readCounts = { loops: count(readBack.loops), investigations: count(readBack.investigations) }
+    for (const table of tables) {
+      counts[table] = count(state[table])
+      readCounts[table] = count(readBack[table])
     }
     const mismatched = Object.keys(counts).filter((key) => counts[key] !== readCounts[key])
     if (mismatched.length) {
@@ -222,7 +218,11 @@ export function createStorage({ dataDir, coreFile, logger }) {
     }
     committed = state
     migrationReport = { ...report, backupPath, verifiedAt: nowIso(), counts, readCounts, mismatched }
-    notices.push({ id: 'store:migrated', level: 'info', text: `数据已从 v1 迁移到 v2，原文件备份在 ${backupPath}` })
+    notices.push({
+      id: 'store:migrated',
+      level: 'info',
+      text: `数据已从 v${report.fromSchema || '?'} 迁移到 v${SCHEMA_VERSION}，原文件备份在 ${backupPath}`,
+    })
   }
 
   let initPromise = null
@@ -274,12 +274,12 @@ export function createStorage({ dataDir, coreFile, logger }) {
       if (version === SCHEMA_VERSION) {
         const check = validateState(raw, { core })
         if (!check.ok) {
-          markFatal('STATE_INVALID', '数据文件不符合 v2 契约：' + check.errors.slice(0, 5).map((e) => e.message).join('；'))
+          markFatal('STATE_INVALID', '数据文件不符合 v' + SCHEMA_VERSION + ' 契约：' + check.errors.slice(0, 5).map((e) => e.message).join('；'))
           return
         }
         committed = raw
         for (const warning of check.warnings || []) notices.push({ id: 'state:' + warning.code, level: 'warn', text: warning.message })
-      } else if (version === 1) {
+      } else if (version === 1 || version === 2) {
         await migrate(raw)
       } else if (typeof version === 'number' && version > SCHEMA_VERSION) {
         markFatal('STATE_NEWER', `数据文件版本 ${version} 高于本插件支持的 ${SCHEMA_VERSION}；请升级插件，原文件未改动`)
