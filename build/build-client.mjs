@@ -1,5 +1,5 @@
 /**
- * 回路客户端构建器：把 src/client/** 打包为单文件 client.js。
+ * 掌控（Grasp）客户端构建器：把 src/client/** 打包为单文件 client.js。
  *
  * 约束（见 docs/refactor-spec.md 第 0/1 节）：
  * - 只用 node: 内置模块，不新增依赖；
@@ -384,7 +384,7 @@ async function build() {
 
   const output = [
     '/*!',
-    ' * 回路 (Loop) 客户端单文件产物 — 由 build/build-client.mjs 从 src/client/** 生成，请勿手改。',
+    ' * 掌控 (Grasp) 客户端单文件产物 — 由 build/build-client.mjs 从 src/client/** 生成，请勿手改。',
     ` * 模块：${order.length} 个 · zh key：${Object.keys(mergedZh).length} · en key：${Object.keys(mergedEn).length}`,
     ' * 运行形态：__ModuleLoader__.load({ id: \'@local/loop-atlas\', factory(require) {…} })',
     ' */',
