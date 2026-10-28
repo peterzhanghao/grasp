@@ -4,6 +4,7 @@ import assert from 'node:assert/strict'
 import {
   SCHEMA_VERSION,
   STATE_TABLES,
+  LOOP_TABLES,
   DEFAULT_VIEW,
   emptyState,
   subjectKey,
@@ -74,13 +75,19 @@ function withTable(state, table, key, value) {
   return state
 }
 
-test('SCHEMA_VERSION=2，STATE_TABLES 覆盖契约的 8 张表', () => {
-  assert.equal(SCHEMA_VERSION, 2)
+test('SCHEMA_VERSION=3：v2 八张表 + v3 掌控卡/干预/观察表', () => {
+  assert.equal(SCHEMA_VERSION, 3)
   assert.deepEqual(
     [...STATE_TABLES].sort(),
     ['dialogs', 'experiments', 'investigations', 'notes', 'predictions', 'relations', 'revisions', 'tasks'].sort(),
   )
-  assert.equal(Object.keys(DEFAULT_VIEW).length, 7)
+  assert.deepEqual([...LOOP_TABLES], ['loops', 'interventions', 'observations'])
+  assert.equal(Object.keys(DEFAULT_VIEW).length, 9)
+  const state = emptyState()
+  assert.deepEqual(Object.keys(state.loops), [])
+  assert.deepEqual(Object.keys(state.interventions), [])
+  assert.deepEqual(Object.keys(state.observations), [])
+  assert.deepEqual(Object.keys(state.archive), [])
 })
 
 test('emptyState 通过全量校验，且每次返回独立对象', () => {

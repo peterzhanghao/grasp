@@ -12,6 +12,7 @@ import assert from 'node:assert/strict'
 import { stat, readdir } from 'node:fs/promises'
 import { join } from 'node:path'
 import { createHost, pickIds, getCore, getState, assertOk, assertClientError } from './helpers.mjs'
+import { SCHEMA_VERSION } from '../../src/domain/schema.js'
 
 const clone = (value) => JSON.parse(JSON.stringify(value))
 
@@ -36,7 +37,7 @@ test('R0 · 导出 → 干净数据目录导入 → 可读', async (t) => {
   const run = assertOk(await source.host.op('experiment.run', { experimentId: 'delay', params: { K: 1.2, D: 0 }, subject: { kind: 'node', id: nodeId }, prediction: 'D=0 应收敛' }), 'experiment.run')
   const pack = await exportPack(source.host)
   assert.equal(pack.kind, 'loop-atlas-user-package')
-  assert.equal(pack.schemaVersion, 2)
+  assert.equal(pack.schemaVersion, SCHEMA_VERSION)
   assert.ok(pack.tables?.notes?.[note.note.id], '导出包缺少笔记')
 
   const target = await createHost(t, { label: 'import-dst' })

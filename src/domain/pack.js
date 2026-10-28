@@ -15,6 +15,7 @@ import { createHash } from 'node:crypto'
 import {
   SCHEMA_VERSION,
   STATE_TABLES,
+  LOOP_TABLES,
   TABLE_KINDS,
   IMPORT_MODES,
   buildRefContext,
@@ -25,9 +26,38 @@ import {
   subjectKey,
   validateRecord,
 } from './schema.js'
-import { migrateV1 } from './migrate.js'
+import {
+  LOOP_DEFAULTS,
+  INTERVENTION_DEFAULTS,
+  OBSERVATION_DEFAULTS,
+  validateLoopRecord,
+  validateInterventionRecord,
+  validateObservationRecord,
+} from './loop-schema.js'
+import { migrateToV3 } from './migrate.js'
 
 export const PACK_KIND = 'loop-atlas-user-package'
+
+/** 用户数据包里可以导入/导出的表：v2 旧表 + v3 掌控卡/干预/观察。 */
+export const PACK_TABLES = Object.freeze([...STATE_TABLES, ...LOOP_TABLES])
+
+const LOOP_TABLE_KIND = Object.freeze({ loops: 'loop', interventions: 'intervention', observations: 'observation' })
+const LOOP_VALIDATORS = Object.freeze({ loop: validateLoopRecord, intervention: validateInterventionRecord, observation: validateObservationRecord })
+const LOOP_DEFAULT_FIELDS = Object.freeze({ loop: LOOP_DEFAULTS, intervention: INTERVENTION_DEFAULTS, observation: OBSERVATION_DEFAULTS })
+
+const cloneValue = (value) => (value === null || typeof value !== 'object' ? value : JSON.parse(JSON.stringify(value)))
+
+/** 只保留契约字段并补默认值（与 schema.normalizeRecord 同语义，v3 新表用）。 */
+function normalizeLoopValue(table, raw) {
+  if (!isObj(raw)) return null
+  const kind = LOOP_TABLE_KIND[table]
+  const defaults = LOOP_DEFAULT_FIELDS[kind]
+  const record = {}
+  for (const [field, fallback] of Object.entries(defaults)) {
+    record[field] = Object.prototype.hasOwnProperty.call(raw, field) && raw[field] !== undefined ? cloneValue(raw[field]) : cloneValue(fallback)
+  }
+  return record
+}
 
 /** 包大小上限 8 MiB（HTTP 请求体上限 12 MiB，由 host 的 webServer 层限制）。 */
 export const MAX_PACK_BYTES = 8 * 1024 * 1024
@@ -38,7 +68,7 @@ const isObj = (v) => v !== null && typeof v === 'object' && !Array.isArray(v)
 
 function emptyTables() {
   const tables = {}
-  for (const table of STATE_TABLES) tables[table] = {}
+  for (const table of PACK_TABLES) tables[table] = {}
   return tables
 }
 
@@ -53,6 +83,7 @@ const PACK_SHELL_FIELDS = Object.freeze([
   'exportedAt',
   'tables',
   ...STATE_TABLES,
+  ...LOOP_TABLES,
 ])
 
 function packVersionOf(pack) {
@@ -78,7 +109,7 @@ function errorEntry(path, code, message) {
 function countSummary(perTable, extra = {}) {
   const byTable = {}
   let total = 0
-  for (const table of STATE_TABLES) {
+  for (const table of PACK_TABLES) {
     byTable[table] = perTable[table] || { records: 0, valid: 0, invalid: 0, existing: 0, new: 0, same: 0, different: 0 }
     total += byTable[table].records
   }
@@ -94,7 +125,7 @@ function unionSets(base, extra) {
 
 function packTablesFrom(source) {
   const tables = emptyTables()
-  for (const table of STATE_TABLES) {
+  for (const table of PACK_TABLES) {
     if (source[table] === undefined) continue
     if (!isObj(source[table])) return { ok: false, errors: [errorEntry(table, 'TYPE', `${table} 必须是对象（表）`)] }
     tables[table] = source[table]
@@ -113,6 +144,7 @@ function expectedKeysOf(table, value) {
 }
 
 function normalizeStoreValue(table, raw) {
+  if (LOOP_TABLE_KIND[table]) return normalizeLoopValue(table, raw)
   if (table === 'revisions') {
     const normalized = normalizeRevisions(raw)
     return normalized.ok ? normalized.record : null
@@ -172,34 +204,51 @@ export function validatePack(pack, options = {}) {
     const picked = packTablesFrom(tableSource)
     if (!picked.ok) errors.push(...picked.errors)
     else tables = picked.tables
-    for (const table of STATE_TABLES) {
-      if (tableSource[table] === undefined) warnings.push(errorEntry(table, 'MISSING_TABLE', `包中没有 ${table} 表，按空表处理`))
-    }
     for (const key of Object.keys(pack)) {
       if (!PACK_SHELL_FIELDS.includes(key)) {
         warnings.push(errorEntry(key, 'UNKNOWN_FIELD', `未知包字段 ${key} 已忽略`))
       }
     }
-  } else if (rawVersion === 1) {
+  } else if (rawVersion === 2 || rawVersion === 1) {
     migrated = true
-    const legacy = {
-      schemaVersion: 1,
-      notes: tableSource.notes,
-      revisions: tableSource.revisions,
-      experiments: tableSource.experiments,
-      contracts: tableSource.contracts,
-      predictions: tableSource.predictions,
-      view: tableSource.view,
-    }
-    const migration = migrateV1(legacy, { now: ctx.now })
-    if (!migration.report.ok) {
+    // v1/v2 包按用户数据同一迁移链归一为 v3（旧表保留，v3 新表由迁移生成）
+    const legacyState =
+      rawVersion === 1
+        ? {
+            schemaVersion: 1,
+            notes: tableSource.notes,
+            revisions: tableSource.revisions,
+            experiments: tableSource.experiments,
+            contracts: tableSource.contracts,
+            predictions: tableSource.predictions,
+            view: tableSource.view,
+          }
+        : {
+            schemaVersion: 2,
+            notes: tableSource.notes,
+            revisions: tableSource.revisions,
+            relations: tableSource.relations,
+            investigations: tableSource.investigations,
+            predictions: tableSource.predictions,
+            experiments: tableSource.experiments,
+            tasks: tableSource.tasks,
+            dialogs: tableSource.dialogs,
+            view: tableSource.view,
+            importLog: [],
+          }
+    const migration = migrateToV3(legacyState, { now: ctx.now })
+    if (!migration.report.ok || !migration.state) {
       errors.push(errorEntry('schemaVersion', 'PACK_MIGRATION', migration.report.error || '旧版数据包迁移失败'))
     } else {
-      for (const table of STATE_TABLES) tables[table] = migration.state[table] || {}
-      warnings.push(errorEntry('schemaVersion', 'MIGRATED', 'v1 数据包已按用户数据迁移规则归一为 v2'))
+      for (const table of PACK_TABLES) tables[table] = migration.state[table] || {}
+      warnings.push(errorEntry('schemaVersion', 'MIGRATED', `v${rawVersion} 数据包已按用户数据迁移链归一为 v${SCHEMA_VERSION}`))
     }
   } else {
-    errors.push(errorEntry('schemaVersion', 'PACK_SCHEMA', `不支持的数据包 schemaVersion：${JSON.stringify(pack.schemaVersion)}（支持 2，旧 1 会先迁移）`))
+    errors.push(errorEntry('schemaVersion', 'PACK_SCHEMA', `不支持的数据包 schemaVersion：${JSON.stringify(pack.schemaVersion)}（支持 2/3，旧 1 会先迁移）`))
+  }
+
+  for (const table of PACK_TABLES) {
+    if (tableSource[table] === undefined) warnings.push(errorEntry(table, 'MISSING_TABLE', `包中没有 ${table} 表，按空表处理`))
   }
 
   if (errors.length) {
@@ -225,6 +274,9 @@ export function validatePack(pack, options = {}) {
     investigationIds: new Set(expectedKeysOf('investigations', tables.investigations)),
     runIds: new Set(expectedKeysOf('experiments', tables.experiments)),
     predictionIds: new Set(expectedKeysOf('predictions', tables.predictions)),
+    loopIds: new Set(expectedKeysOf('loops', tables.loops)),
+    interventionIds: new Set(expectedKeysOf('interventions', tables.interventions)),
+    observationIds: new Set(expectedKeysOf('observations', tables.observations)),
   }
   const refCtx = {
     ...base,
@@ -232,11 +284,14 @@ export function validatePack(pack, options = {}) {
     investigationIds: unionSets(base.investigationIds, packIds.investigationIds),
     runIds: unionSets(base.runIds, packIds.runIds),
     predictionIds: unionSets(base.predictionIds, packIds.predictionIds),
+    loopIds: unionSets(base.loopIds, packIds.loopIds),
+    interventionIds: unionSets(base.interventionIds, packIds.interventionIds),
+    observationIds: unionSets(base.observationIds, packIds.observationIds),
   }
   if (!base.nodeIds) warnings.push(errorEntry('', 'NO_CORE', '未提供内容包索引，跳过节点/关系引用校验（host 必须传入 core）'))
 
   const normalizedTables = emptyTables()
-  for (const table of STATE_TABLES) {
+  for (const table of PACK_TABLES) {
     const kind = TABLE_KINDS[table]
     const source = tables[table]
     const stats = { records: 0, valid: 0, invalid: 0, existing: 0, new: 0, same: 0, different: 0 }
@@ -264,6 +319,27 @@ export function validatePack(pack, options = {}) {
         // 引用闭合：修订必须挂在包内或已有笔记上
         if (!refCtx.noteIds.has(key)) {
           errors.push(errorEntry(path, 'DANGLING_REF', `修订记录指向不存在的笔记：${key}`))
+        }
+      } else if (LOOP_TABLE_KIND[table]) {
+        const kind = LOOP_TABLE_KIND[table]
+        const record0 = normalizeLoopValue(table, raw)
+        if (!record0) {
+          stats.invalid += 1
+          errors.push(errorEntry(path, 'TYPE', `${table} 记录必须是对象`))
+          continue
+        }
+        record = record0
+        if (Object.prototype.hasOwnProperty.call(record, 'id') && record.id !== key) {
+          errors.push(errorEntry(`${path}.id`, 'KEY_MISMATCH', `表键 ${key} 与记录 id ${JSON.stringify(record.id)} 不一致`))
+        }
+        const validated = LOOP_VALIDATORS[kind](record, refCtx, path)
+        warnings.push(...(validated.warnings || []))
+        if (!validated.ok) {
+          stats.invalid += 1
+          errors.push(...validated.errors)
+          record = null
+        } else {
+          stats.valid += 1
         }
       } else {
         const normalized = normalizeRecord(kind, raw, path)
@@ -328,7 +404,7 @@ export function validatePack(pack, options = {}) {
         version: packVersionOf(pack),
         coreVersion: typeof pack.coreVersion === 'string' ? pack.coreVersion : null,
         exportedAt: typeof pack.exportedAt === 'string' ? pack.exportedAt : null,
-        migratedFrom: migrated ? 1 : null,
+        migratedFrom: migrated ? rawVersion : null,
         tables: normalizedTables,
       }
   // 内容指纹：只对规范化后的表内容做稳定序列化，键顺序不同不会产生不同 hash。
@@ -359,6 +435,7 @@ const TABLE_WRITE_ORDER = Object.freeze([
   'experiments',
   'tasks',
   'dialogs',
+  ...LOOP_TABLES,
 ])
 
 function ensureTable(store, table) {

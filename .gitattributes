@@ -1,0 +1,3 @@
+# 构建产物按 LF 检出：build/build-client.mjs --check 会比较原始字节，CRLF 会误报不同步。
+* text=auto
+client.js text eol=lf

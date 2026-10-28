@@ -1,12 +1,17 @@
 /**
  * 掌控 · 领域层 schema（纯函数，无 IO、无 ctx、无第三方依赖）
  *
- * 契约：docs/refactor-spec.md 第 2 节（用户数据 schema v2）。
+ * 契约：docs/v2-design.md 第 2/11 节（用户数据 schema v3：v2 表 + 掌控卡/干预/观察）。
  * 这里只做结构、枚举、时间戳与引用闭合校验；不做 IO，不写盘，不产生副作用。
  * 所有校验返回 { ok, errors:[{path,code,message}], warnings:[...] }，不抛异常。
  */
 
-export const SCHEMA_VERSION = 2
+import { LOOP_TABLES as V3_TABLES, emptyLoopTables, validateLoopTables } from './loop-schema.js'
+
+export const SCHEMA_VERSION = 3
+
+/** v3 新增表；与 v2 表并存（旧表保留用于追溯，新 UI 只写新表）。 */
+export const LOOP_TABLES = V3_TABLES
 
 /** 用户数据包中被导入/导出的 8 张表；view/meta/importLog 由 Host 单独处理。 */
 export const STATE_TABLES = Object.freeze([
@@ -32,7 +37,7 @@ export const TABLE_KINDS = Object.freeze({
   dialogs: 'dialog',
 })
 
-export const SUBJECT_KINDS = Object.freeze(['node', 'relation', 'investigation'])
+export const SUBJECT_KINDS = Object.freeze(['node', 'relation', 'investigation', 'loop'])
 export const NOTE_KINDS = Object.freeze(['理解', '疑问', '证据', '反驳', '实践'])
 export const NOTE_STATUSES = Object.freeze(['active', 'archived'])
 export const AUTHOR_SOURCES = Object.freeze(['user', 'ai-draft', 'import'])
@@ -61,6 +66,10 @@ export const NOTICE_LEVELS = Object.freeze(['info', 'warn'])
 export const IMPORT_MODES = Object.freeze(['merge', 'skip', 'replace'])
 
 export const DEFAULT_VIEW = Object.freeze({
+  // v3：首页只有一个主入口；activeLoopId 指向当前掌控卡。
+  screen: 'home',
+  activeLoopId: null,
+  // v2 字段保留（旧数据与旧测试兼容；v3 UI 不再以 scale/projection 为导航）。
   scale: 'domain',
   projection: 'theory',
   selectedNodeId: null,
@@ -197,6 +206,9 @@ export function buildRefContext({ core, store } = {}) {
     runIds: null,
     predictionIds: null,
     taskIds: null,
+    loopIds: null,
+    interventionIds: null,
+    observationIds: null,
   }
   if (core && typeof core === 'object') {
     ctx.nodeIds = new Set((Array.isArray(core.nodes) ? core.nodes : []).map((n) => n && n.id).filter(isString))
@@ -213,6 +225,9 @@ export function buildRefContext({ core, store } = {}) {
     ctx.runIds = new Set(Object.keys(store.experiments || {}))
     ctx.predictionIds = new Set(Object.keys(store.predictions || {}))
     ctx.taskIds = new Set(Object.keys(store.tasks || {}))
+    ctx.loopIds = new Set(Object.keys(store.loops || {}))
+    ctx.interventionIds = new Set(Object.keys(store.interventions || {}))
+    ctx.observationIds = new Set(Object.keys(store.observations || {}))
   }
   return ctx
 }
@@ -236,6 +251,7 @@ function validateSubjectRef(subject, ctx, path, errors) {
   if (subject.kind === 'node') ok = checkRef(subject.id, ctx.nodeIds, `${path}.id`, errors, '节点引用') && ok
   if (subject.kind === 'relation') ok = checkRef(subject.id, ctx.relationIds, `${path}.id`, errors, '关系引用') && ok
   if (subject.kind === 'investigation') ok = checkRef(subject.id, ctx.investigationIds, `${path}.id`, errors, '研究问题引用') && ok
+  if (subject.kind === 'loop') ok = checkRef(subject.id, ctx.loopIds, `${path}.id`, errors, '掌控卡引用') && ok
   return ok
 }
 
@@ -702,6 +718,12 @@ function validateRelationAnnotation(record, ctx, path, errors, warnings) {
 function validateView(record, ctx, path, errors, warnings) {
   checkEnum(record.scale, VIEW_SCALES, `${path}.scale`, errors)
   checkEnum(record.projection, VIEW_PROJECTIONS, `${path}.projection`, errors)
+  if (record.screen !== undefined && !['home', 'wizard', 'loop', 'library', 'resources'].includes(record.screen)) {
+    pushError(errors, `${path}.screen`, 'ENUM', 'screen 必须是 home|wizard|loop|library|resources 之一')
+  }
+  if (record.activeLoopId !== undefined && record.activeLoopId !== null) {
+    checkRef(record.activeLoopId, ctx.loopIds, `${path}.activeLoopId`, errors, '当前掌控卡引用')
+  }
   for (const [field, refSet, label] of [
     ['selectedNodeId', ctx.nodeIds, '节点引用'],
     ['selectedRelationId', ctx.relationIds, '关系引用'],
@@ -809,6 +831,8 @@ export function emptyState(overrides = {}) {
     experiments: {},
     tasks: {},
     dialogs: {},
+    ...emptyLoopTables(),
+    archive: {},
     view: { ...DEFAULT_VIEW },
     importLog: [],
   }
@@ -834,6 +858,10 @@ const TOP_LEVEL_FIELDS = Object.freeze([
   'experiments',
   'tasks',
   'dialogs',
+  'loops',
+  'interventions',
+  'observations',
+  'archive',
   'view',
   'importLog',
 ])
@@ -895,6 +923,11 @@ export function validateState(state, options = {}) {
     }
   }
 
+  // v3 新表：掌控卡 / 干预 / 观察（v2 表保留，供追溯与兼容）
+  const loopResult = validateLoopTables(state, { nodeIds: ctx.nodeIds })
+  errors.push(...loopResult.errors)
+  warnings.push(...loopResult.warnings)
+
   // 表键与记录 id 一致性
   for (const table of ['notes', 'investigations', 'predictions', 'experiments', 'tasks']) {
     const value = isPlainObject(state[table]) ? state[table] : {}
@@ -949,7 +982,8 @@ export function validateState(state, options = {}) {
     }
   }
 
-  // meta / view / importLog
+  // meta / view / importLog / archive
+  if (!isPlainObject(state.archive)) pushError(errors, 'archive', 'TYPE', 'archive 必须是对象（表）')
   if (!isPlainObject(state.meta)) pushError(errors, 'meta', 'TYPE', 'meta 必须是对象')
   else validateMeta(state.meta, {}, 'meta', errors, warnings)
   if (!isPlainObject(state.view)) pushError(errors, 'view', 'TYPE', 'view 必须是对象')

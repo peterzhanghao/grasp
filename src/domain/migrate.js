@@ -126,14 +126,14 @@ export function migrateV1(rawV1, options = {}) {
     }
   }
 
-  if (raw.schemaVersion === SCHEMA_VERSION) {
+  if (raw.schemaVersion === 2) {
     return {
       state: raw,
       report: {
         ok: true,
         already: true,
-        fromSchema: SCHEMA_VERSION,
-        toSchema: SCHEMA_VERSION,
+        fromSchema: 2,
+        toSchema: 2,
         migratedAt: null,
         requiresBackup: false,
         backupPath,
@@ -155,8 +155,8 @@ export function migrateV1(rawV1, options = {}) {
         ok: false,
         already: false,
         fromSchema: version,
-        toSchema: SCHEMA_VERSION,
-        error: `不支持的 schemaVersion：${JSON.stringify(raw.schemaVersion)}（只支持 1 → 2）`,
+        toSchema: 2,
+        error: `不支持的 schemaVersion：${JSON.stringify(raw.schemaVersion)}（migrateV1 只支持 1 → 2）`,
         requiresBackup: true,
         backupPath,
         counts: {},
@@ -169,6 +169,8 @@ export function migrateV1(rawV1, options = {}) {
   const warnings = []
   const warn = (code, message, ids) => warnings.push({ code, message, ids })
   const state = emptyState()
+  // v1 → v2 的中间态：显式标为 2，v3 由 migrateV2 继续。
+  state.schemaVersion = 2
   state.meta = { fromSchema: 1, migratedAt: now, backupPath, contentVersion, notices: [] }
   state.importLog = []
 
@@ -390,7 +392,7 @@ export function migrateV1(rawV1, options = {}) {
     ok: true,
     already: false,
     fromSchema: 1,
-    toSchema: SCHEMA_VERSION,
+    toSchema: 2,
     migratedAt: now,
     requiresBackup: true,
     backupPath,
@@ -413,4 +415,380 @@ export function migrateV1(rawV1, options = {}) {
 
 function isStringLike(value) {
   return typeof value === 'string' && value.trim().length > 0
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// v2 → v3：把研究问题/预测/实验映射成掌控卡/干预/观察；v2 表原样保留（不丢数据）
+// ─────────────────────────────────────────────────────────────────────────────
+
+/** v2 研究问题状态 → v3 掌控卡状态。映射是保守的：不确定就停在较早状态。 */
+export const V2_LOOP_STATUS_MAP = Object.freeze({
+  open: 'modeled',
+  testing: 'testing',
+  supported: 'reviewing',
+  revised: 'revised',
+  inconclusive: 'paused',
+})
+
+/** v2 预测状态 → v3 观察 verdict（旧「已解决但无结局」只能记为不足以判断）。 */
+export const V2_VERDICT_MAP = Object.freeze({
+  supported: 'supported',
+  refuted: 'refuted',
+  open: 'inconclusive',
+  inconclusive: 'inconclusive',
+})
+
+const LOOP_ID_RE = /[^A-Za-z0-9_-]/g
+const v3Id = (prefix, rawId) => `${prefix}${String(rawId).replace(LOOP_ID_RE, '_')}`
+
+const emptyLoopRecord = () => ({
+  systemType: 'custom',
+  summary: '',
+  goal: { quantity: '', criterion: '', current: '' },
+  measurement: { how: '', cadence: '', source: 'unknown', confidence: null },
+  action: { levers: [], cannot: [] },
+  disturbances: [],
+  delays: [],
+  boundary: { nonGoals: [], notes: '' },
+  hypothesis: { claim: '', counter: '', falsifier: '' },
+  gaps: [],
+  principleRefs: [],
+  nextAction: null,
+  nextCheck: null,
+  application: { acceptance: [], stopConditions: [], checkpoints: [], taskIds: [] },
+  version: 1,
+  versions: [],
+  legacy: true,
+  lastOpenedAt: null,
+})
+
+function emptyObservation(loopId, at) {
+  return {
+    loopId,
+    interventionId: null,
+    at,
+    source: 'manual',
+    metric: { kind: 'text', value: '', unit: '' },
+    compare: { prediction: '', verdict: 'inconclusive', reason: '' },
+    evidenceRefs: [],
+    noteIds: [],
+  }
+}
+
+/**
+ * v2 → v3 迁移（纯函数）。
+ * - 每个 v2 investigation 生成一张 legacy 掌控卡（lp_<invId>）。
+ * - 未解决的 prediction → planned 干预；已解决的 prediction → 观察（不重新判定）。
+ * - 每条 experiment run → 观察（source=experiment，旧判据与新观察语义不同，记为不足以判断）。
+ * - 无归属的预测/实验统一挂到 `lp_legacy_v2`，不丢弃。
+ * - v2 旧表（investigations/predictions/experiments/tasks/notes/dialogs）原样保留，便于追溯与回退。
+ *
+ * @param {object} rawV2
+ * @param {{now?:string, backupPath?:string, contentVersion?:string}} [opts]
+ */
+export function migrateV2(rawV2, opts = {}) {
+  const now = isIsoTimestamp(opts.now) ? opts.now : new Date().toISOString()
+  let backupPath = typeof opts.backupPath === 'string' ? opts.backupPath : null
+  const contentVersion = typeof opts.contentVersion === 'string' ? opts.contentVersion : null
+
+  let raw
+  try {
+    raw = JSON.parse(JSON.stringify(rawV2))
+  } catch {
+    raw = null
+  }
+
+  const fail = (error, fromSchema) => ({
+    state: null,
+    report: {
+      ok: false,
+      already: false,
+      fromSchema,
+      toSchema: SCHEMA_VERSION,
+      error,
+      requiresBackup: true,
+      backupPath,
+      counts: {},
+      warnings: [],
+      notices: [],
+    },
+  })
+
+  if (!isObj(raw)) return fail('v2 数据不是可迁移的对象', null)
+  if (raw.schemaVersion === SCHEMA_VERSION) {
+    return {
+      state: raw,
+      report: {
+        ok: true,
+        already: true,
+        fromSchema: SCHEMA_VERSION,
+        toSchema: SCHEMA_VERSION,
+        migratedAt: null,
+        requiresBackup: false,
+        backupPath,
+        counts: countV3Tables(raw),
+        warnings: [],
+        notices: [],
+      },
+    }
+  }
+  if (raw.schemaVersion !== 2) return fail(`不支持的 schemaVersion：${JSON.stringify(raw.schemaVersion)}（migrateV2 只支持 2 → 3）`, raw.schemaVersion)
+
+  // 复用数据文件里已有的备份路径（例如 v1→v2 时创建的 pre-v2 备份），避免丢失「迁移前文件在哪」。
+  if (!backupPath && isObj(raw.meta) && typeof raw.meta.backupPath === 'string') backupPath = raw.meta.backupPath
+
+  const state = emptyState()
+  state.schemaVersion = SCHEMA_VERSION
+
+  // v2 表原样保留（深拷贝已在 raw 完成）
+  for (const table of ['notes', 'revisions', 'relations', 'investigations', 'predictions', 'experiments', 'tasks', 'dialogs']) {
+    state[table] = isObj(raw[table]) ? raw[table] : {}
+  }
+  state.importLog = Array.isArray(raw.importLog) ? raw.importLog : []
+  state.archive = {}
+
+  const warnings = []
+  const warn = (code, message, ids) => warnings.push({ code, message, ids })
+  const notices = Array.isArray(raw.meta?.notices) ? raw.meta.notices.map((item) => ({ ...item })) : []
+  const chains = []
+  const loopIdByInvestigation = new Map()
+
+  // ── 研究问题 → 掌控卡 ───────────────────────────────────
+  for (const [invId, inv] of Object.entries(state.investigations)) {
+    if (!isObj(inv)) {
+      warn('INVESTIGATION_INVALID', `研究问题 ${invId} 不是对象，无法映射为掌控卡`)
+      continue
+    }
+    const loopId = v3Id('lp_', invId)
+    const createdAt = nowFallback(inv.createdAt, now)
+    const updatedAt = nowFallback(inv.updatedAt, createdAt)
+    const loop = {
+      ...emptyLoopRecord(),
+      id: loopId,
+      title: isStringLike(inv.title) ? inv.title : `旧研究问题 ${invId}`,
+      summary: isStringLike(inv.title) ? `由 v2 研究问题迁移：${inv.title}` : '由 v2 研究问题迁移',
+      hypothesis: {
+        claim: typeof inv.claim === 'string' ? inv.claim : '',
+        counter: typeof inv.counter === 'string' ? inv.counter : '',
+        falsifier: '',
+      },
+      status: V2_LOOP_STATUS_MAP[inv.status] || 'paused',
+      nextAction: isStringLike(inv.nextTest)
+        ? { type: 'intervene', text: inv.nextTest, estimateMin: 30, dueAt: null }
+        : null,
+      versions: [{ version: 1, at: updatedAt, changeSummary: '由 v2 研究问题迁移（旧表保留）', snapshot: {} }],
+      createdAt,
+      updatedAt,
+    }
+    state.loops[loopId] = loop
+    loopIdByInvestigation.set(invId, loopId)
+    chains.push({ from: `investigation:${invId}`, to: `loop:${loopId}` })
+  }
+
+  // ── 预测 → 干预 / 观察 ─────────────────────────────────
+  const needLegacyLoop = []
+  for (const [predictionId, prediction] of Object.entries(state.predictions)) {
+    if (!isObj(prediction)) {
+      warn('PREDICTION_INVALID', `预测 ${predictionId} 不是对象，已跳过映射`)
+      continue
+    }
+    let loopId = prediction.investigationId && loopIdByInvestigation.get(prediction.investigationId)
+    if (!loopId) {
+      loopId = 'lp_legacy_v2'
+      needLegacyLoop.push(predictionId)
+    }
+    const at = nowFallback(prediction.at, now)
+    if (prediction.status === 'open') {
+      const interventionId = v3Id('iv_', predictionId)
+      state.interventions[interventionId] = {
+        id: interventionId,
+        loopId,
+        action: '（v2 预测迁移：旧版没有记录实际干预动作）',
+        predicted: typeof prediction.text === 'string' ? prediction.text : '',
+        windowStart: at,
+        windowEnd: null,
+        status: 'planned',
+        at,
+      }
+      chains.push({ from: `prediction:${predictionId}`, to: `intervention:${interventionId}` })
+    } else {
+      const observationId = v3Id('ob_', predictionId)
+      const observation = emptyObservation(loopId, nowFallback(prediction.resolvedAt, at))
+      observation.id = observationId
+      observation.compare = {
+        prediction: typeof prediction.text === 'string' ? prediction.text : '',
+        verdict: V2_VERDICT_MAP[prediction.status] || 'inconclusive',
+        reason:
+          prediction.status === 'inconclusive'
+            ? 'v2 旧预测没有记录支持/反驳结局，迁移不改变结论级别'
+            : 'v2 预测结论原样迁移，未重新判定',
+      }
+      state.observations[observationId] = observation
+      chains.push({ from: `prediction:${predictionId}`, to: `observation:${observationId}` })
+    }
+  }
+
+  // ── 实验记录 → 观察 ────────────────────────────────────
+  for (const [runId, run] of Object.entries(state.experiments)) {
+    if (!isObj(run)) {
+      warn('EXPERIMENT_INVALID', `实验记录 ${runId} 不是对象，已跳过映射`)
+      continue
+    }
+    let loopId = run.investigationId && loopIdByInvestigation.get(run.investigationId)
+    if (!loopId) {
+      loopId = 'lp_legacy_v2'
+      needLegacyLoop.push(runId)
+    }
+    const observationId = v3Id('ob_run_', runId)
+    const observation = emptyObservation(loopId, nowFallback(run.at, now))
+    observation.id = observationId
+    observation.source = 'experiment'
+    observation.metric = {
+      kind: 'text',
+      value: `实验 ${isStringLike(run.experimentId) ? run.experimentId : 'unknown'} · 旧判定 ${isStringLike(run.verdict) ? run.verdict : 'unknown'}`,
+      unit: '',
+    }
+    observation.compare = {
+      prediction: typeof run.prediction === 'string' ? run.prediction : '',
+      verdict: 'inconclusive',
+      reason: 'v2 实验记录的判据属于旧模型，迁移不冒充新观察结论；请以原实验记录为准',
+    }
+    observation.evidenceRefs = [{ kind: 'experiment', id: runId }]
+    state.observations[observationId] = observation
+    chains.push({ from: `experiment:${runId}`, to: `observation:${observationId}` })
+  }
+
+  // 没有归属的旧记录统一挂到一张 legacy 卡，避免成为悬空数据
+  if (needLegacyLoop.length) {
+    const createdAt = now
+    state.loops['lp_legacy_v2'] = {
+      ...emptyLoopRecord(),
+      id: 'lp_legacy_v2',
+      title: '旧记录（v2 迁移）',
+      summary: 'v2 中没有研究问题归属的预测/实验记录，统一挂到这张卡以便追溯；不删除、不改写。',
+      status: 'archived',
+      versions: [{ version: 1, at: createdAt, changeSummary: '由 v2 无归属记录迁移', snapshot: {} }],
+      createdAt,
+      updatedAt: createdAt,
+    }
+    notices.push({
+      id: 'migration-v2-legacy-loop',
+      level: 'info',
+      text: `${needLegacyLoop.length} 条旧预测/实验没有研究问题归属，已挂到「旧记录（v2 迁移）」卡，不丢弃。`,
+    })
+  }
+
+  // ── 视角 ───────────────────────────────────────────────
+  const rawView = isObj(raw.view) ? raw.view : {}
+  const mappedActiveLoopId = rawView.activeInvestigationId
+    ? loopIdByInvestigation.get(rawView.activeInvestigationId) || null
+    : null
+  state.view = {
+    screen: 'home',
+    activeLoopId: mappedActiveLoopId,
+    scale: ['domain', 'subject', 'evidence'].includes(rawView.scale) ? rawView.scale : 'domain',
+    projection: ['theory', 'history', 'practice'].includes(rawView.projection) ? rawView.projection : 'theory',
+    selectedNodeId: isStringLike(rawView.selectedNodeId) ? rawView.selectedNodeId : null,
+    selectedRelationId: isStringLike(rawView.selectedRelationId) ? rawView.selectedRelationId : null,
+    activeInvestigationId: isStringLike(rawView.activeInvestigationId) ? rawView.activeInvestigationId : null,
+    directoryOpen: rawView.directoryOpen !== false,
+    rightOpen: rawView.rightOpen !== false,
+  }
+
+  // ── meta ───────────────────────────────────────────────
+  const fromSchema = raw.meta && Number.isInteger(raw.meta.fromSchema) ? raw.meta.fromSchema : 2
+  state.meta = {
+    fromSchema,
+    migratedAt: now,
+    backupPath,
+    contentVersion,
+    notices,
+  }
+  notices.push({
+    id: 'migration-v2-v3',
+    level: 'info',
+    text: `已从 v2 迁移到 v3（${now}）：研究问题 → 掌控卡，预测/实验 → 干预或观察；v2 旧表原样保留，可追溯、可回退。`,
+  })
+
+  const counts = countV3Tables(state)
+  const report = {
+    ok: true,
+    already: false,
+    fromSchema: 2,
+    toSchema: SCHEMA_VERSION,
+    migratedAt: now,
+    requiresBackup: true,
+    backupPath,
+    contentVersion,
+    counts: {
+      ...counts,
+      loopsFromInvestigations: loopIdByInvestigation.size,
+      legacyLoopCreated: needLegacyLoop.length > 0,
+      chains: chains.length,
+    },
+    warnings,
+    notices,
+  }
+  return { state, report }
+}
+
+function countV3Tables(state) {
+  return {
+    notes: Object.keys(state.notes || {}).length,
+    revisions: Object.keys(state.revisions || {}).length,
+    investigations: Object.keys(state.investigations || {}).length,
+    predictions: Object.keys(state.predictions || {}).length,
+    experiments: Object.keys(state.experiments || {}).length,
+    tasks: Object.keys(state.tasks || {}).length,
+    loops: Object.keys(state.loops || {}).length,
+    interventions: Object.keys(state.interventions || {}).length,
+    observations: Object.keys(state.observations || {}).length,
+  }
+}
+
+/**
+ * 统一入口：把 v1/v2 数据迁移到当前 schema（v3）。
+ * v1 走 v1→v2→v3 链；返回值始终带完整 report，便于存储层记录与用户展示。
+ */
+export function migrateToV3(raw, opts = {}) {
+  const version = raw && typeof raw === 'object' ? (raw.schemaVersion === undefined ? 1 : raw.schemaVersion) : null
+  if (version === SCHEMA_VERSION) {
+    return { state: raw, report: { ok: true, already: true, fromSchema: SCHEMA_VERSION, toSchema: SCHEMA_VERSION, migratedAt: null, requiresBackup: false, backupPath: opts.backupPath || null, counts: countV3Tables(raw), warnings: [], notices: [] } }
+  }
+  if (version === 2) return migrateV2(raw, opts)
+  if (version === 1) {
+    const first = migrateV1(raw, opts)
+    if (!first.report.ok) return first
+    const second = migrateV2(first.state, opts)
+    if (!second.report.ok) return second
+    return {
+      state: second.state,
+      report: {
+        ...second.report,
+        fromSchema: 1,
+        chain: ['v1->v2', 'v2->v3'],
+        counts: { ...second.report.counts, v1Migration: first.report.counts },
+        warnings: [...(first.report.warnings || []), ...(second.report.warnings || [])],
+        notices: [...(second.report.notices || [])],
+        encodingSuspected: first.report.encodingSuspected || [],
+        legacyOriginUncertain: first.report.legacyOriginUncertain || [],
+        unknownExperimentIds: first.report.unknownExperimentIds || [],
+      },
+    }
+  }
+  return {
+    state: null,
+    report: {
+      ok: false,
+      already: false,
+      fromSchema: version,
+      toSchema: SCHEMA_VERSION,
+      error: `不支持的数据版本：${JSON.stringify(raw && raw.schemaVersion)}（只支持 1/2 → 3）`,
+      requiresBackup: true,
+      backupPath: opts.backupPath || null,
+      counts: {},
+      warnings: [],
+      notices: [],
+    },
+  }
 }

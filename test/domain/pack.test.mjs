@@ -318,7 +318,7 @@ test('validatePack：v1 数据包先迁移再校验（旧 id → v2 模型）', 
   }
   const result = validatePack(pack, { core, store: emptyState(), now: ISO })
   assert.equal(result.ok, true, JSON.stringify(result.errors))
-  assert.deepEqual(result.schemaVersion, { from: 1, to: 2 })
+  assert.deepEqual(result.schemaVersion, { from: 1, to: SCHEMA_VERSION })
   assert.equal(result.normalized.tables.experiments.e_fixture_delay.modelId, 'delay-v2')
   assert.equal(result.normalized.tables.notes.n_fixture_garbled.encodingSuspected, true)
   assert.ok(result.warnings.some((w) => w.code === 'MIGRATED'))
