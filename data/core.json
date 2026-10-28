@@ -4354,5 +4354,247 @@
         "searchPath": "本插件的 investigations / experiments / notes（用户真实任务记录）"
       }
     ]
+  },
+  "coach": {
+    "version": 1,
+    "questionOrder": [
+      "goal",
+      "measurement",
+      "action",
+      "disturbance",
+      "delay",
+      "hypothesis"
+    ],
+    "fieldMap": {
+      "goal": [
+        "goal.quantity",
+        "goal.criterion",
+        "goal.current"
+      ],
+      "measurement": [
+        "measurement.how",
+        "measurement.cadence"
+      ],
+      "action": [
+        "action.levers",
+        "action.cannot",
+        "boundary.nonGoals"
+      ],
+      "disturbance": [
+        "disturbances[].text"
+      ],
+      "delay": [
+        "delays[].from",
+        "delays[].to",
+        "delays[].estimateSeconds"
+      ],
+      "hypothesis": [
+        "hypothesis.claim",
+        "hypothesis.counter",
+        "hypothesis.falsifier"
+      ]
+    },
+    "gapPlaybook": {
+      "unclear-goal": {
+        "labelKey": "loop.coach.gap.unclear-goal.label",
+        "nodeIds": [
+          "goal",
+          "boundary"
+        ],
+        "firstActionKey": "loop.coach.gap.unclear-goal.firstAction"
+      },
+      "unmeasured": {
+        "labelKey": "loop.coach.gap.unmeasured.label",
+        "nodeIds": [
+          "measurement",
+          "blackbox"
+        ],
+        "firstActionKey": "loop.coach.gap.unmeasured.firstAction"
+      },
+      "late-measurement": {
+        "labelKey": "loop.coach.gap.late-measurement.label",
+        "nodeIds": [
+          "delay",
+          "sampling"
+        ],
+        "firstActionKey": "loop.coach.gap.late-measurement.firstAction"
+      },
+      "authority-gap": {
+        "labelKey": "loop.coach.gap.authority-gap.label",
+        "nodeIds": [
+          "actuator",
+          "variety"
+        ],
+        "firstActionKey": "loop.coach.gap.authority-gap.firstAction"
+      },
+      "saturated": {
+        "labelKey": "loop.coach.gap.saturated.label",
+        "nodeIds": [
+          "actuator",
+          "pi"
+        ],
+        "firstActionKey": "loop.coach.gap.saturated.firstAction"
+      },
+      "proxy": {
+        "labelKey": "loop.coach.gap.proxy.label",
+        "nodeIds": [
+          "indicator",
+          "positive"
+        ],
+        "firstActionKey": "loop.coach.gap.proxy.firstAction"
+      },
+      "missing-counter-signal": {
+        "labelKey": "loop.coach.gap.missing-counter-signal.label",
+        "nodeIds": [
+          "positive",
+          "secondorder"
+        ],
+        "firstActionKey": "loop.coach.gap.missing-counter-signal.firstAction"
+      },
+      "oscillating": {
+        "labelKey": "loop.coach.gap.oscillating.label",
+        "nodeIds": [
+          "stability",
+          "delay"
+        ],
+        "firstActionKey": "loop.coach.gap.oscillating.firstAction"
+      },
+      "drift": {
+        "labelKey": "loop.coach.gap.drift.label",
+        "nodeIds": [
+          "pi",
+          "measurement"
+        ],
+        "firstActionKey": "loop.coach.gap.drift.firstAction"
+      },
+      "adaptation-failure": {
+        "labelKey": "loop.coach.gap.adaptation-failure.label",
+        "nodeIds": [
+          "adaptation",
+          "model"
+        ],
+        "firstActionKey": "loop.coach.gap.adaptation-failure.firstAction"
+      }
+    },
+    "systemTemplates": {
+      "coding-agent": {
+        "labelKey": "loop.coach.template.coding-agent.label",
+        "questionHints": {
+          "goal": "loop.coach.template.coding-agent.hint.goal",
+          "measurement": "loop.coach.template.coding-agent.hint.measurement",
+          "action": "loop.coach.template.coding-agent.hint.action",
+          "disturbance": "loop.coach.template.coding-agent.hint.disturbance",
+          "delay": "loop.coach.template.coding-agent.hint.delay",
+          "hypothesis": "loop.coach.template.coding-agent.hint.hypothesis"
+        },
+        "examples": {
+          "goal": "loop.coach.template.coding-agent.example.goal",
+          "measurement": "loop.coach.template.coding-agent.example.measurement",
+          "action": "loop.coach.template.coding-agent.example.action",
+          "disturbance": "loop.coach.template.coding-agent.example.disturbance",
+          "delay": "loop.coach.template.coding-agent.example.delay",
+          "hypothesis": "loop.coach.template.coding-agent.example.hypothesis"
+        }
+      },
+      "product": {
+        "labelKey": "loop.coach.template.product.label",
+        "questionHints": {
+          "goal": "loop.coach.template.product.hint.goal",
+          "measurement": "loop.coach.template.product.hint.measurement",
+          "action": "loop.coach.template.product.hint.action",
+          "disturbance": "loop.coach.template.product.hint.disturbance",
+          "delay": "loop.coach.template.product.hint.delay",
+          "hypothesis": "loop.coach.template.product.hint.hypothesis"
+        },
+        "examples": {
+          "goal": "loop.coach.template.product.example.goal",
+          "measurement": "loop.coach.template.product.example.measurement",
+          "action": "loop.coach.template.product.example.action",
+          "disturbance": "loop.coach.template.product.example.disturbance",
+          "delay": "loop.coach.template.product.example.delay",
+          "hypothesis": "loop.coach.template.product.example.hypothesis"
+        }
+      },
+      "team": {
+        "labelKey": "loop.coach.template.team.label",
+        "questionHints": {
+          "goal": "loop.coach.template.team.hint.goal",
+          "measurement": "loop.coach.template.team.hint.measurement",
+          "action": "loop.coach.template.team.hint.action",
+          "disturbance": "loop.coach.template.team.hint.disturbance",
+          "delay": "loop.coach.template.team.hint.delay",
+          "hypothesis": "loop.coach.template.team.hint.hypothesis"
+        },
+        "examples": {
+          "goal": "loop.coach.template.team.example.goal",
+          "measurement": "loop.coach.template.team.example.measurement",
+          "action": "loop.coach.template.team.example.action",
+          "disturbance": "loop.coach.template.team.example.disturbance",
+          "delay": "loop.coach.template.team.example.delay",
+          "hypothesis": "loop.coach.template.team.example.hypothesis"
+        }
+      },
+      "personal": {
+        "labelKey": "loop.coach.template.personal.label",
+        "questionHints": {
+          "goal": "loop.coach.template.personal.hint.goal",
+          "measurement": "loop.coach.template.personal.hint.measurement",
+          "action": "loop.coach.template.personal.hint.action",
+          "disturbance": "loop.coach.template.personal.hint.disturbance",
+          "delay": "loop.coach.template.personal.hint.delay",
+          "hypothesis": "loop.coach.template.personal.hint.hypothesis"
+        },
+        "examples": {
+          "goal": "loop.coach.template.personal.example.goal",
+          "measurement": "loop.coach.template.personal.example.measurement",
+          "action": "loop.coach.template.personal.example.action",
+          "disturbance": "loop.coach.template.personal.example.disturbance",
+          "delay": "loop.coach.template.personal.example.delay",
+          "hypothesis": "loop.coach.template.personal.example.hypothesis"
+        }
+      }
+    },
+    "wizardCopy": {
+      "titleKey": "loop.coach.wizard.title",
+      "introKey": "loop.coach.wizard.intro",
+      "progressKey": "loop.coach.wizard.progress",
+      "skipKey": "loop.coach.wizard.skip",
+      "unknownHintKey": "loop.coach.wizard.unknownHint",
+      "draftSavedKey": "loop.coach.wizard.draftSaved",
+      "createCardKey": "loop.coach.wizard.createCard",
+      "createCardHintKey": "loop.coach.wizard.createCardHint",
+      "questions": {
+        "goal": {
+          "titleKey": "loop.coach.question.goal.title",
+          "hintKey": "loop.coach.question.goal.hint",
+          "unknownKey": "loop.coach.question.goal.unknown"
+        },
+        "measurement": {
+          "titleKey": "loop.coach.question.measurement.title",
+          "hintKey": "loop.coach.question.measurement.hint",
+          "unknownKey": "loop.coach.question.measurement.unknown"
+        },
+        "action": {
+          "titleKey": "loop.coach.question.action.title",
+          "hintKey": "loop.coach.question.action.hint",
+          "unknownKey": "loop.coach.question.action.unknown"
+        },
+        "disturbance": {
+          "titleKey": "loop.coach.question.disturbance.title",
+          "hintKey": "loop.coach.question.disturbance.hint",
+          "unknownKey": "loop.coach.question.disturbance.unknown"
+        },
+        "delay": {
+          "titleKey": "loop.coach.question.delay.title",
+          "hintKey": "loop.coach.question.delay.hint",
+          "unknownKey": "loop.coach.question.delay.unknown"
+        },
+        "hypothesis": {
+          "titleKey": "loop.coach.question.hypothesis.title",
+          "hintKey": "loop.coach.question.hypothesis.hint",
+          "unknownKey": "loop.coach.question.hypothesis.unknown"
+        }
+      }
+    }
   }
 }
